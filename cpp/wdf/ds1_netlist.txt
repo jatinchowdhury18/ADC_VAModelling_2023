@@ -1,0 +1,11 @@
+Va 6 2  Vin
+Vb 7 5  R11
+Vc 8 5  C7
+Vd 9 5  R13
+Ve 10 4 R14
+Ra 6 1  Vin
+Rb 7 3  R11
+Rc 8 4  C7
+Rd 9 1  R13
+Re 10 1 R14
+E1 2 3 4 1 Ag
