@@ -1,0 +1,9 @@
+Va 8 3
+Vb 6 1
+Vc 5 1
+Vd 7 1
+Ra 4 8
+Rb 2 6
+Rc 3 5
+Rd 4 7
+E1 2 3 4 1 Ag

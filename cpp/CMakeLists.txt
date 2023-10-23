@@ -17,9 +17,19 @@ CPMAddPackage(
     GIT_TAG main
 )
 
+CPMAddPackage(
+    NAME eigen
+    GIT_REPOSITORY https://gitlab.com/libeigen/eigen
+    GIT_TAG 3.4.1
+)
+
 add_executable(circuit_model_plotter circuit_model_plotter.cpp)
 target_link_libraries(circuit_model_plotter
     PRIVATE
         chowdsp::chowdsp_wdf
         matplotlib-cpp
+        Eigen3::Eigen
+)
+target_sources(circuit_model_plotter PRIVATE
+    ndk/TS_NDK.cpp
 )

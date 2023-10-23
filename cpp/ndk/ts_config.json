@@ -1,0 +1,40 @@
+{
+    "struct_name": "TS_NDK",
+    "netlist": [
+        "Vi 1 0",
+        "Vb 6 0 FIXED",
+        "R5 2 6",
+        "R4 4 0",
+        "RL 5 0",
+        "R6_P1 3 5 VARIABLE",
+        "C2 2 1",
+        "C3 3 4",
+        "C4 3 5",
+        "A1 2 3 5 # PLUS MINUS OUT",
+        "DP1 3 5"
+    ],
+    "output_nodes": [ 5 ],
+    "header_includes": [
+        "#include <Eigen/Dense>"
+    ],
+    "cpp_struct_entries": [
+        "    static constexpr size_t MAX_NUM_CHANNELS = 1;",
+        "    static constexpr auto R6 = 51.0e3;",
+        "    static constexpr auto P1 = 500.0e3;"
+    ],
+    "cpp_namespace_entries": [
+        "constexpr auto R5 = 10.0e3;",
+        "constexpr auto R4 = 4.7e3;",
+        "constexpr auto RL = 1.0e6;",
+        "constexpr auto C2 = 1.0e-6;",
+        "constexpr auto C3 = 0.047e-6;",
+        "constexpr auto C4 = 51.0e-12;",
+        "constexpr auto Vt = 26.0e-3;",
+        "constexpr auto Is_DP1 = 4.352e-9;",
+        "constexpr auto n_DP1 = 1.906;",
+        "constexpr auto Vb = 4.5;"
+    ],
+    "initial_state_x_n": "1.6115299199259692E-13, 0.040608000000007714, -2.4576912723008024E-17",
+    "initial_state_v_n": "-2.5090771459586759E-12",
+    "nr_exit_condition": "delta > 1.0e-3 && ++nIters < 10"
+}
