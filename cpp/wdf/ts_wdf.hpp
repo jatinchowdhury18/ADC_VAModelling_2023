@@ -13,6 +13,10 @@ struct TS_WDF
         Vin_C2.prepare ((float) sample_rate);
         R4_ser_C3.prepare ((float) sample_rate);
         R6_P1_par_C4.prepare ((float) sample_rate);
+
+        std::vector<float> pre_buffer_data {};
+        pre_buffer_data.resize (1000, 4.5f);
+        process (pre_buffer_data, pre_buffer_data);
     }
 
     void set_distortion (float dist_01)
