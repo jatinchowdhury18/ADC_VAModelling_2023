@@ -1,4 +1,5 @@
 ---
+title: 'ADC23 - VA Modelling'
 # try also 'default' to start simple
 theme: seriph
 # apply any windi css classes to the current slide
@@ -44,6 +45,11 @@ image: /Background.jpeg # @TODO: replcae the cover image
 
 ---
 src: ./pages/intro.md
+hide: false
+---
+
+---
+src: ./pages/wdf.md
 hide: false
 ---
 
