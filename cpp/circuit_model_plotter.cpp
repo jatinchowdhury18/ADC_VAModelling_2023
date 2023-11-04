@@ -6,6 +6,7 @@ namespace plt = matplotlibcpp;
 
 #include "ndk/TS_NDK.h"
 #include "wdf/ts_wdf.hpp"
+#include "rnn/ts_rnn.hpp"
 
 static constexpr auto sample_rate = 96000.0f;
 static constexpr auto test_freq = 100.0f;
@@ -14,9 +15,13 @@ int main (int argc, char* argv[])
 {
     if (argc == 0 || std::string { argv[1] } == "--help")
     {
-        std::cout << "Options: --wdf or --ndk" << std::endl;
+        std::cout << "Options: --wdf, --rnn, or --ndk" << std::endl;
         return 1;
     }
+
+    plt::figure_size (1000, 750);
+    plt::xlabel ("Time [samples]");
+    plt::ylabel ("Signal [V]");
 
     const auto data = []
     {
@@ -38,7 +43,9 @@ int main (int argc, char* argv[])
             std::vector<float> wdf_out;
             wdf_out.resize (data.size());
             ts_wdf.process (data, wdf_out);
-            plt::named_plot<float> ("Distortion: " + std::to_string (distortion_val), wdf_out);
+
+            const auto plot_name = "P1 = " + std::to_string (static_cast<int> (TS_WDF::Pot1 * distortion_val) / 1000) + " KOhms";
+            plt::named_plot<float> (plot_name, wdf_out);
         }
     }
     else if (std::string { argv[1] } == "--ndk")
@@ -55,8 +62,23 @@ int main (int argc, char* argv[])
             plt::named_plot<double> ("Distortion: " + std::to_string (distortion_val), ndk_out);
         }
     }
+    if (std::string { argv[1] } == "--rnn")
+    {
+        TS_RNN<48> ts_rnn { "model_best_48.json" };
+        for (auto distortion_val : { 0.0f, 0.1f, 1.0f })
+        {
+            ts_rnn.set_distortion (distortion_val);
+            ts_rnn.prepare (sample_rate);
+            std::vector<float> wdf_out;
+            wdf_out.resize (data.size());
+            ts_rnn.process (data, wdf_out);
 
-    plt::ylim (3.5, 5.5);
+            const auto plot_name = "P1 = " + std::to_string (static_cast<int> (TS_WDF::Pot1 * distortion_val) / 1000) + " KOhms";
+            plt::named_plot<float> (plot_name, wdf_out);
+        }
+    }
+
+    plt::ylim (3.75, 5.25);
     plt::xlim (1000, 4500);
     plt::legend();
     plt::grid (true);

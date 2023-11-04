@@ -60,26 +60,57 @@ void write_file (const char* path, std::span<const T> data, int samplerate)
 
 int main (int argc, char* argv[])
 {
-    if (argc != 4 || std::string { argv[1] } == "--help")
+    //    if (argc != 4 || std::string { argv[1] } == "--help")
+    //    {
+    //        std::cout << "Usage: data_generator <data_dir> <dist_value>" << std::endl;
+    //        return 1;
+    //    }
+
+    static constexpr int sample_rate = 96000;
+    static constexpr int N = 4 * sample_rate;
+    std::vector<float> in_data;
+    in_data.resize ((size_t) N, 0.0f);
+    for (size_t n = 0; n < N; ++n)
     {
-        std::cout << "Usage: data_generator <in_file> <out_file> <dist_value>" << std::endl;
-        return 1;
+        const auto freq = [n]
+        {
+            if (n < (size_t) sample_rate)
+                return 50.0f;
+            else if (n < 2 * (size_t) sample_rate)
+                return 100.0f;
+            else if (n < 3 * (size_t) sample_rate)
+                return 250.0f;
+            else
+                return 500.0f;
+        }();
+        in_data[n] = 0.999f * std::sin (2.0f * (float) M_PI * (float) n * freq / sample_rate);
     }
 
-    const auto [in_data, sample_rate] = read_file<float> (argv[1]);
-    if (in_data.empty())
-        return 1;
-
-    std::vector<float> out_data { in_data.begin(), in_data.end() };
-    std::transform (out_data.begin(), out_data.end(), out_data.begin(), [] (float x) { return 0.2f * x + 4.5f; });
+    write_file<float> ("train_input_96k.wav", in_data, sample_rate);
 
     TS_WDF ts_wdf {};
-    ts_wdf.set_distortion (static_cast<float> (std::atof (argv[3])));
-    ts_wdf.prepare (static_cast<float> (sample_rate));
-    ts_wdf.process (out_data, out_data);
+    for (std::pair<float, const char*> config : { std::make_pair (0.0f, "out_00.wav"),
+                                                  std::make_pair (0.001f, "out_0001.wav"),
+                                                  std::make_pair (0.01f, "out_001.wav"),
+                                                  std::make_pair (0.1f, "out_01.wav"),
+                                                  std::make_pair (0.3f, "out_03.wav"),
+                                                  std::make_pair (0.7f, "out_07.wav"),
+                                                  std::make_pair (1.0f, "out_10.wav") })
+    {
+        std::vector<float> out_data { in_data.begin(), in_data.end() };
+        std::transform (out_data.begin(), out_data.end(), out_data.begin(), [] (float x)
+                        { return 0.2f * x + 4.5f; });
 
-    std::transform (out_data.begin(), out_data.end(), out_data.begin(), [] (float x) { return 0.016f * (x - 4.5f); });
-    write_file<float> (argv[2], out_data, sample_rate);
+        ts_wdf.set_distortion (config.first);
+        ts_wdf.prepare (static_cast<float> (sample_rate));
+        ts_wdf.process (out_data, out_data);
+
+        std::transform (out_data.begin(), out_data.end(), out_data.begin(), [] (float x)
+                        { return (x - 4.5f) / 2.3f; });
+        std::cout << *std::max_element (out_data.begin(), out_data.end()) << ", ";
+        std::cout << *std::min_element (out_data.begin(), out_data.end()) << std::endl;
+        write_file<float> (config.second, out_data, sample_rate);
+    }
 
     return 0;
 }
