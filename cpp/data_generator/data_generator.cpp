@@ -67,21 +67,23 @@ int main (int argc, char* argv[])
     //    }
 
     static constexpr int sample_rate = 96000;
-    static constexpr int N = 4 * sample_rate;
+    static constexpr int N = 10 * sample_rate;
     std::vector<float> in_data;
     in_data.resize ((size_t) N, 0.0f);
     for (size_t n = 0; n < N; ++n)
     {
         const auto freq = [n]
         {
-            if (n < (size_t) sample_rate)
+            if (n < 2 * (size_t) sample_rate)
                 return 50.0f;
-            else if (n < 2 * (size_t) sample_rate)
+            else if (n < 4 * (size_t) sample_rate)
                 return 100.0f;
-            else if (n < 3 * (size_t) sample_rate)
+            else if (n < 6 * (size_t) sample_rate)
                 return 250.0f;
-            else
+            else if (n < 8 * (size_t) sample_rate)
                 return 500.0f;
+            else
+                return 1000.0f;
         }();
         in_data[n] = 0.999f * std::sin (2.0f * (float) M_PI * (float) n * freq / sample_rate);
     }
@@ -105,8 +107,9 @@ int main (int argc, char* argv[])
         ts_wdf.prepare (static_cast<float> (sample_rate));
         ts_wdf.process (out_data, out_data);
 
+//        std::cout << *std::max_element (out_data.begin(), out_data.end()) - 4.5f << std::endl;
         std::transform (out_data.begin(), out_data.end(), out_data.begin(), [] (float x)
-                        { return (x - 4.5f) / 2.3f; });
+                        { return (x - 4.5f) / 6.25f; });
         std::cout << *std::max_element (out_data.begin(), out_data.end()) << ", ";
         std::cout << *std::min_element (out_data.begin(), out_data.end()) << std::endl;
         write_file<float> (config.second, out_data, sample_rate);
