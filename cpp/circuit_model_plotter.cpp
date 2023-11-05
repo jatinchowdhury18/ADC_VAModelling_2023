@@ -66,7 +66,7 @@ int main (int argc, char* argv[])
     else if (std::string { argv[1] } == "--rnn")
     {
         TS_RNN<48> ts_rnn { "model_best_48.json" };
-        for (auto distortion_val : { 0.0f, 0.1f, 1.0f })
+        for (auto distortion_val : { 0.0f, 0.4f, 1.0f })
         {
             ts_rnn.set_distortion (distortion_val);
             ts_rnn.prepare (sample_rate);
