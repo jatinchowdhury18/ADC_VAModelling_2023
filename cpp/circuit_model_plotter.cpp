@@ -20,7 +20,7 @@ int main (int argc, char* argv[])
         return 1;
     }
 
-//    plt::figure_size (1000, 750);
+    plt::figure_size (1000, 750);
     plt::xlabel ("Time [samples]");
     plt::ylabel ("Signal [V]");
 
@@ -94,7 +94,8 @@ int main (int argc, char* argv[])
         }
     }
 
-    plt::ylim (3.5, 5.5);
+//    plt::ylim (3.5, 5.5);
+    plt::ylim (3.75, 5.25);
     plt::xlim (1000, 4500);
     plt::legend();
     plt::grid (true);

@@ -102,10 +102,10 @@ struct TS_MNA
     // constants
     static constexpr auto C3 = 0.047e-6f;
     static constexpr auto R4 = 4.7e3f;
-    float gC3_recip = 1.0f / gC3;
-    float gC3_R4_recip = 1.0f / (1.0f + gC3 * R4);
     // sample-rate dependent values
     float gC3 = 2.0f * fs * C3;
+    float gC3_recip = 1.0f / gC3;
+    float gC3_R4_recip = 1.0f / (1.0f + gC3 * R4);
     // state
     float iC3eq = 0.0f;
 
