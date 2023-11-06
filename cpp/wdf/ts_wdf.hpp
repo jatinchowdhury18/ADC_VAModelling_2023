@@ -5,26 +5,27 @@
 
 namespace wdft = chowdsp::wdft;
 
+template <typename T = float>
 struct TS_WDF
 {
     void prepare (double sample_rate)
     {
-        R5.setVoltage (4.5f);
-        Vin_C2.prepare ((float) sample_rate);
-        R4_ser_C3.prepare ((float) sample_rate);
-        R6_P1_par_C4.prepare ((float) sample_rate);
+        R5.setVoltage ((T) 4.5);
+        Vin_C2.prepare ((T) sample_rate);
+        R4_ser_C3.prepare ((T) sample_rate);
+        R6_P1_par_C4.prepare ((T) sample_rate);
 
-        std::vector<float> pre_buffer_data {};
-        pre_buffer_data.resize (1000, 4.5f);
+        std::vector<T> pre_buffer_data {};
+        pre_buffer_data.resize (1000, (T) 4.5);
         process (pre_buffer_data, pre_buffer_data);
     }
 
     void set_distortion (float dist_01)
     {
-        R6_P1_par_C4.setResistanceValue (Pot1 * dist_01 + R6);
+        R6_P1_par_C4.setResistanceValue (static_cast<T> (Pot1 * dist_01 + R6));
     }
 
-    void process (std::span<const float> in_data, std::span<float> out_data) noexcept
+    void process (std::span<const T> in_data, std::span<T> out_data) noexcept
     {
         for (size_t n = 0; n < in_data.size(); ++n)
         {
@@ -33,29 +34,29 @@ struct TS_WDF
             dp.incident (P3.reflected());
             P3.incident (dp.reflected());
 
-            out_data[n] = wdft::voltage<float> (RL);
+            out_data[n] = wdft::voltage<T> (RL);
         }
     }
 
     // Port B
-    wdft::CapacitiveVoltageSourceT<float> Vin_C2 { 1.0e-6f };
-    wdft::ResistiveVoltageSourceT<float> R5 { 10.0e3f };
-    wdft::WDFParallelT<float, decltype (Vin_C2), decltype (R5)> P1 { Vin_C2, R5 };
+    wdft::CapacitiveVoltageSourceT<T> Vin_C2 { (T) 1.0e-6 };
+    wdft::ResistiveVoltageSourceT<T> R5 { (T) 10.0e3 };
+    wdft::WDFParallelT<T, decltype (Vin_C2), decltype (R5)> P1 { Vin_C2, R5 };
 
     // Port C
-    wdft::ResistorCapacitorSeriesT<float> R4_ser_C3 { 4.7e3f, 0.047e-6f };
+    wdft::ResistorCapacitorSeriesT<T> R4_ser_C3 { (T) 4.7e3, (T) 0.047e-6 };
 
     // Port D
-    wdft::ResistorT<float> RL { 1.0e6f };
+    wdft::ResistorT<T> RL { (T) 1.0e6 };
 
     struct ImpedanceCalc
     {
         template <typename RType>
         static float calcImpedance (RType& R)
         {
-            constexpr float Ag = 1000.0f; // op-amp gain
-            constexpr float Ri = 5.0e6f; // op-amp input impedance
-            constexpr float Ro = 2.0e-1f; // op-amp output impedance
+            static constexpr auto Ag = (T) 1000.0; // op-amp gain
+            static constexpr auto Ri = (T) 5.0e6; // op-amp input impedance
+            static constexpr auto Ro = (T) 2.0e-1; // op-amp output impedance
 
             const auto [Rb, Rc, Rd] = R.getPortImpedances();
 
@@ -71,14 +72,14 @@ struct TS_WDF
         }
     };
 
-    wdft::RtypeAdaptor<float, 0, ImpedanceCalc, decltype (P1), decltype (R4_ser_C3), decltype (RL)> R { P1, R4_ser_C3, RL };
+    wdft::RtypeAdaptor<T, 0, ImpedanceCalc, decltype (P1), decltype (R4_ser_C3), decltype (RL)> R { P1, R4_ser_C3, RL };
 
     // Port A
-    static constexpr auto R6 = 51.0e3f;
-    static constexpr auto Pot1 = 500.0e3f;
-    wdft::ResistorCapacitorParallelT<float> R6_P1_par_C4 { R6, 51.0e-12f };
-    wdft::WDFParallelT<float, decltype (R6_P1_par_C4), decltype (R)> P3 { R6_P1_par_C4, R };
+    static constexpr auto R6 = (T) 51.0e3;
+    static constexpr auto Pot1 = (T) 500.0e3;
+    wdft::ResistorCapacitorParallelT<float> R6_P1_par_C4 { R6, (T) 51.0e-12 };
+    wdft::WDFParallelT<T, decltype (R6_P1_par_C4), decltype (R)> P3 { R6_P1_par_C4, R };
 
-    static constexpr float Vt = 26.0e-3f;
-    wdft::DiodePairT<float, decltype (P3)> dp { P3, 4.352e-9f, Vt, 1.906f }; // 1N4148
+    static constexpr auto Vt = (T) 26.0e-3;
+    wdft::DiodePairT<T, decltype (P3)> dp { P3, (T) 4.352e-9, Vt, (T) 1.906 }; // 1N4148
 };

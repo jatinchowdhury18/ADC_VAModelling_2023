@@ -1,28 +1,30 @@
 #pragma once
 
+#include <cmath>
 #include <span>
 #include <vector>
 
+template <typename T = float>
 struct TS_MNA
 {
     void prepare (double sample_rate)
     {
-        fs = static_cast<float> (sample_rate);
+        fs = static_cast<T> (sample_rate);
 
-        gC2 = 2.0f * fs * C2;
-        gC2_R5_recip = 1.0f / (1.0f + gC2 * R5);
-        gC3 = 2.0f * fs * C3;
-        gC3_recip = 1.0f / gC3;
-        gC3_R4_recip = 1.0f / (1.0f + gC3 * R4);
-        gC4 = 2.0f * fs * C4;
+        gC2 = (T) 2 * fs * C2;
+        gC2_R5_recip = (T) 1 / ((T) 1 + gC2 * R5);
+        gC3 = (T) 2 * fs * C3;
+        gC3_recip = (T) 1 / gC3;
+        gC3_R4_recip = (T) 1 / ((T) 1 + gC3 * R4);
+        gC4 = (T) 2 * fs * C4;
 
-        iC2eq = 0.0f;
-        iC3eq = 0.040607851f;
-        iC4eq = 1.69891257E-9f;
-        Vd = 0.000173500041f;
+        iC2eq = (T) 0.0;
+        iC3eq = (T) 0.040607851;
+        iC4eq = (T) 1.69891257E-9;
+        Vd = (T) 0.000173500041;
 
-        std::vector<float> pre_buffer_data {};
-        pre_buffer_data.resize (1000, 4.5f);
+        std::vector<T> pre_buffer_data {};
+        pre_buffer_data.resize (1000, (T) 4.5);
         process (pre_buffer_data, pre_buffer_data);
     }
 
@@ -31,7 +33,7 @@ struct TS_MNA
         RP_recip = 1.0f / (R6 + dist_01 * P1);
     }
 
-    void process (std::span<const float> in_data, std::span<float> out_data) noexcept
+    void process (std::span<const T> in_data, std::span<T> out_data) noexcept
     {
         for (size_t n = 0; n < in_data.size(); ++n)
         {
@@ -42,11 +44,11 @@ struct TS_MNA
             const auto iC3 = (gC3 * Vminus - iC3eq) * gC3_R4_recip; // compute current through C3 (same as current through R4)
 
             int nIters = 0;
-            float delta;
+            T delta;
             do
             {
                 // compute sinh and cosh at the same time so it's faster...
-                const auto sinh_cosh = [] (float x) noexcept
+                const auto sinh_cosh = [] (T x) noexcept
                 {
                     // ref: https://en.wikipedia.org/wiki/Hyperbolic_functions#Definitions
                     // sinh = (e^(2x) - 1) / (2e^x), cosh = (e^(2x) + 1) / (2e^x)
@@ -54,8 +56,8 @@ struct TS_MNA
                     // simplifying, we get: sinh = 0.5 (B - 1/B), cosh = 0.5 (B + 1/B)
 
                     auto B = std::exp (x);
-                    auto Br = 0.5f / B;
-                    B *= 0.5f;
+                    auto Br = (T) 0.5 / B;
+                    B *= (T) 0.5;
 
                     auto sinh = B - Br;
                     auto cosh = B + Br;
@@ -72,57 +74,57 @@ struct TS_MNA
                 const auto F_deriv = RP_recip + gC4 + (twoIs * Vt_recip) * cosh_Vd;
                 delta = F / F_deriv;
                 Vd -= delta;
-            } while (std::abs (delta) > 1.0e-5f && ++nIters < 10);
+            } while (std::abs (delta) > (T) 1.0e-5 && ++nIters < 10);
 
             // update capacitor states
             const auto vC2 = Vi - Vplus;
-            iC2eq = 2.0f * gC2 * vC2 - iC2eq;
+            iC2eq = (T) 2 * gC2 * vC2 - iC2eq;
             const auto vC3 = (iC3 + iC3eq) * gC3_recip;
-            iC3eq = 2.0f * gC3 * vC3 - iC3eq;
-            iC4eq = 2.0f * gC4 * Vd - iC4eq;
+            iC3eq = (T) 2 * gC3 * vC3 - iC3eq;
+            iC4eq = (T) 2 * gC4 * Vd - iC4eq;
 
             out_data[n] = Vminus + Vd; // read output voltage
         }
     }
 
-    float fs = 0.0f;
+    T fs = {};
 
     // input -> plus-terminal:
     // constants
-    static constexpr auto C2 = 1.0e-6f;
-    static constexpr auto R5 = 10.0e3f;
-    static constexpr auto Vb = 4.5f;
+    static constexpr auto C2 = (T) 1.0e-6;
+    static constexpr auto R5 = (T) 10.0e3;
+    static constexpr auto Vb = (T) 4.5;
     // sample-rate dependent values
-    float gC2 = 2.0f * fs * C2;
-    float gC2_R5_recip = 1.0f / (1.0f + gC2 * R5);
+    T gC2 = (T) 2 * fs * C2;
+    T gC2_R5_recip = (T) 1 / ((T) 1 + gC2 * R5);
     // state
-    float iC2eq = 0.0f;
+    T iC2eq = {};
 
     // minus-terminal -> ground
     // constants
-    static constexpr auto C3 = 0.047e-6f;
-    static constexpr auto R4 = 4.7e3f;
+    static constexpr auto C3 = (T) 0.047e-6;
+    static constexpr auto R4 = (T) 4.7e3;
     // sample-rate dependent values
-    float gC3 = 2.0f * fs * C3;
-    float gC3_recip = 1.0f / gC3;
-    float gC3_R4_recip = 1.0f / (1.0f + gC3 * R4);
+    T gC3 = (T) 2 * fs * C3;
+    T gC3_recip = (T) 1 / gC3;
+    T gC3_R4_recip = (T) 1 / ((T) 1 + gC3 * R4);
     // state
-    float iC3eq = 0.0f;
+    T iC3eq = {};
 
     // feedback path
     // constants
-    static constexpr auto R6 = 51.0e3f;
-    static constexpr auto P1 = 500.0e3f;
-    static constexpr auto C4 = 51.0e-12f;
-    static constexpr auto Vt = 26.0e-3f;
-    static constexpr auto twoIs = 2.0f * 4.352e-9f;
-    static constexpr auto nabla = 1.906f;
-    static constexpr auto Vt_recip = 1.0f / (nabla * Vt);
+    static constexpr auto R6 = (T) 51.0e3;
+    static constexpr auto P1 = (T) 500.0e3;
+    static constexpr auto C4 = (T) 51.0e-12;
+    static constexpr auto Vt = (T) 26.0e-3;
+    static constexpr auto twoIs = (T) 2.0f * 4.352e-9;
+    static constexpr auto nabla = (T) 1.906;
+    static constexpr auto Vt_recip = (T) 1 / (nabla * Vt);
     // parameter-dependent values
-    float RP_recip = 1.0f / (R6 + 0.1f * P1);
+    T RP_recip = (T) 1 / (R6 + (T) 0.1 * P1);
     // sample-rate dependent values
-    float gC4 = 2.0f * fs * C4;
+    float gC4 = (T) 2 * fs * C4;
     // state
-    float iC4eq = 0.0f;
-    float Vd = 0.0f; // not really state, but allows us to use the previous value for an initial guess in the NR solver
+    T iC4eq = {};
+    T Vd = {}; // not really state, but allows us to use the previous value for an initial guess in the NR solver
 };

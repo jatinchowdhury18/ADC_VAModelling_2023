@@ -1,4 +1,4 @@
-#include "../wdf/ts_wdf.hpp"
+#include "../mna/ts_mna.hpp"
 #include <iostream>
 #include <sndfile.h>
 
@@ -51,9 +51,9 @@ void write_file (const char* path, std::span<const T> data, int samplerate)
     }
 
     if constexpr (std::is_same_v<T, float>)
-        sf_write_float (file_handle, data.data(), data.size());
+        sf_writef_float (file_handle, data.data(), data.size());
     else if constexpr (std::is_same_v<T, double>)
-        sf_write_double (file_handle, data.data(), data.size());
+        sf_writef_double (file_handle, data.data(), data.size());
 
     sf_close (file_handle);
 }
@@ -68,8 +68,8 @@ int main (int argc, char* argv[])
 
     static constexpr int sample_rate = 96000;
     static constexpr int N = 10 * sample_rate;
-    std::vector<float> in_data;
-    in_data.resize ((size_t) N, 0.0f);
+    std::vector<double> in_data;
+    in_data.resize ((size_t) N, 0.0);
     for (size_t n = 0; n < N; ++n)
     {
         const auto freq = [n]
@@ -85,12 +85,12 @@ int main (int argc, char* argv[])
             else
                 return 1000.0f;
         }();
-        in_data[n] = 0.999f * std::sin (2.0f * (float) M_PI * (float) n * freq / sample_rate);
+        in_data[n] = static_cast<double> (0.999f * std::sin (2.0f * (float) M_PI * (float) n * freq / sample_rate));
     }
 
-    write_file<float> ("train_input_96k.wav", in_data, sample_rate);
+    write_file<double> ("train_input_96k.wav", in_data, sample_rate);
 
-    TS_WDF ts_wdf {};
+    TS_MNA<double> ts_model {};
     for (std::pair<float, const char*> config : { std::make_pair (0.0f, "out_00.wav"),
                                                   std::make_pair (0.001f, "out_0001.wav"),
                                                   std::make_pair (0.01f, "out_001.wav"),
@@ -99,20 +99,20 @@ int main (int argc, char* argv[])
                                                   std::make_pair (0.7f, "out_07.wav"),
                                                   std::make_pair (1.0f, "out_10.wav") })
     {
-        std::vector<float> out_data { in_data.begin(), in_data.end() };
-        std::transform (out_data.begin(), out_data.end(), out_data.begin(), [] (float x)
-                        { return 0.2f * x + 4.5f; });
+        std::vector<double> out_data { in_data.begin(), in_data.end() };
+        std::transform (out_data.begin(), out_data.end(), out_data.begin(), [] (auto x)
+                        { return 0.2 * x + 4.5; });
 
-        ts_wdf.set_distortion (config.first);
-        ts_wdf.prepare (static_cast<float> (sample_rate));
-        ts_wdf.process (out_data, out_data);
+        ts_model.set_distortion (config.first);
+        ts_model.prepare (static_cast<double> (sample_rate));
+        ts_model.process (out_data, out_data);
 
-//        std::cout << *std::max_element (out_data.begin(), out_data.end()) - 4.5f << std::endl;
-        std::transform (out_data.begin(), out_data.end(), out_data.begin(), [] (float x)
-                        { return (x - 4.5f) / 6.25f; });
+//                std::cout << *std::max_element (out_data.begin(), out_data.end()) - 4.5 << std::endl;
+        std::transform (out_data.begin(), out_data.end(), out_data.begin(), [] (auto x)
+                        { return (x - 4.5) * 1.55; });
         std::cout << *std::max_element (out_data.begin(), out_data.end()) << ", ";
         std::cout << *std::min_element (out_data.begin(), out_data.end()) << std::endl;
-        write_file<float> (config.second, out_data, sample_rate);
+        write_file<double> (config.second, out_data, sample_rate);
     }
 
     return 0;
