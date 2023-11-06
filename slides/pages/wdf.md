@@ -11,7 +11,14 @@ Previously, at ADC 2020:
 
 </v-clicks>
 
-TODO: image showing ports and adaptors
+<v-clicks at="4">
+
+<div>
+<br/>
+<img src="/wdf_diagrams.png" style="margin-left:auto;margin-right:auto;width:75%">
+
+</div>
+</v-clicks>
 
 ---
 
@@ -54,8 +61,12 @@ Label Nodes (between the ports):
 
 # Overdrive Circuit R-Type Adaptor
 
+<div class="grid grid-cols-[55%_45%] gap-2">
+<div>
+
 Construct a netlist for the R-Type Adaptor:
-- Replace each port with a Thevenin equivalent circuit (voltage source + resistor).
+- Replace each port with a Thevenin equivalent circuit.
+  - Thevenin: voltage source + series resistor.
 - Example:
   - Port A goes from node 3 → 4
 
@@ -64,12 +75,24 @@ Va 3 x # C4, DP, R6+P1
 Ra 4 x
 ```
 
+</div>
+<div>
+
+<img src="/ts_schematic_wdf_ports.svg" style="margin-left:auto;margin-right:auto">
+<img src="/ts_schematic_wdf_nodes.svg" style="margin-left:auto;margin-right:auto">
+
+</div>
+</div>
+
 ---
 
 # Overdrive Circuit R-Type Adaptor
 
+<div class="grid grid-cols-[55%_45%] gap-2">
+<div>
+
 Construct a netlist for the R-Type Adaptor:
-- Replace each port with a Thevenin equivalent circuit (voltage source + resistor).
+- Replace each port with a Thevenin equivalent circuit.
 - Example:
   - Port A goes from node 3 → 4
   - Add ports B (1 → 2), C (1 → 3), D (1 → 4)
@@ -85,12 +108,22 @@ Rc 3 x
 Rd 4 x
 ```
 
+
+</div>
+<div>
+
+<img src="/ts_schematic_wdf_ports.svg" style="margin-left:auto;margin-right:auto">
+<img src="/ts_schematic_wdf_nodes.svg" style="margin-left:auto;margin-right:auto">
+
+</div>
+</div>
+
 ---
 
 # Overdrive Circuit R-Type Adaptor
 
 Construct a netlist for the R-Type Adaptor:
-- Replace each port with a Thevenin equivalent circuit (voltage source + resistor).
+- Replace each port with a Thevenin equivalent circuit.
 - Example:
   - Port A goes from node 3 → 4
   - Add ports B (1 → 2), C (1 → 3), D (1 → 4)
@@ -111,12 +144,15 @@ Rd 4 8
 
 # Overdrive Circuit R-Type Adaptor
 
+<div class="grid grid-cols-[55%_45%] gap-2">
+<div>
+
 Construct a netlist for the R-Type Adaptor:
-- Replace each port with a Thevenin equivalent circuit (voltage source + resistor).
+- Replace each port with a Thevenin equivalent circuit.
 - Example:
   - Port A goes from node 3 → 4
   - Add ports B (1 → 2), C (1 → 3), D (1 → 4)
-  - Add "virtual" nodes between each voltage source/resistor pair (A → 5, B → 6, C → 7, D → 8)
+  - Add "virtual" nodes
   - Add Op-Amp nodes
 
 ```txt {9}
@@ -128,8 +164,17 @@ Ra 4 5
 Rb 2 6
 Rc 3 7
 Rd 4 8
-E1 2 3 4 1 Ag # U1
+E1 2 3 4 1 Ag # U1 (plus, minus, out, ground)
 ```
+
+</div>
+<div>
+
+<img src="/ts_schematic_wdf_ports.svg" style="margin-left:auto;margin-right:auto">
+<img src="/ts_schematic_wdf_nodes.svg" style="margin-left:auto;margin-right:auto">
+
+</div>
+</div>
 
 ---
 
@@ -299,3 +344,14 @@ struct Overdrive_WDF
 
 <img src="/ts_wdf_plot.png" style="margin-left:auto;margin-right:auto;height:90%">
 
+---
+
+# Wave Digital Filters
+
+<v-clicks>
+
+- Can be extended to handle all arbitrary linear circuit topologies with R-Type adaptors.
+- Can resolve up to one nonlinear element without requiring an iterative solver.
+- Circuits with multiple/multi-port nonlinear elements typically require an iterative solver.
+
+</v-clicks>

@@ -49,6 +49,11 @@ hide: false
 ---
 
 ---
+src: ./pages/nodal.md
+hide: false
+---
+
+---
 src: ./pages/wdf.md
 hide: false
 ---
