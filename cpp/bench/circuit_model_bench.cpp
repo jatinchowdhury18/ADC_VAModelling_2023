@@ -1,7 +1,6 @@
-#include <array>
+#include <chrono>
 #include <random>
-
-#include <benchmark/benchmark.h>
+#include <vector>
 
 #include "../mna/ts_mna.hpp"
 #include "../ndk/TS_NDK.h"
@@ -9,74 +8,70 @@
 #include "../wdf/ts_wdf.hpp"
 
 static constexpr double fs = 96000.0;
-static constexpr size_t num_samples = static_cast<size_t> (fs) * 10;
+static constexpr size_t num_samples = static_cast<size_t> (fs) * 200;
 
 const auto input_data = []
 {
     std::vector<float> signal;
     signal.resize (num_samples, {});
 
-    std::random_device dev;
-    std::mt19937 rng { dev() };
-    std::uniform_real_distribution<float> dist { 4.3f, 4.7f };
-
-    for (auto& sample : signal)
-    {
-        sample = dist (rng);
-    }
+    for (size_t n = 0; n < num_samples; ++n)
+        signal[n] = 0.2f * std::sin (2.0f * (float) M_PI * 200.0f * (float) n / (float) fs) + 4.5f;
 
     return signal;
 }();
 
-template <typename ModelType>
-void run_model_bench (benchmark::State& state, ModelType& ts_model)
+template <typename ModelType, typename... Args>
+void run_model_bench (std::string_view name, Args&&... args)
 {
+    std::cout << "Running benchmark for model: " << name << std::endl;
+
+    ModelType ts_model { std::forward<Args...> (args)... };
     ts_model.prepare (fs);
     ts_model.set_distortion (0.1f);
 
-    std::array<float, num_samples> output_data {};
-    for (auto _ : state)
-    {
-        ts_model.process (input_data, output_data);
-        benchmark::DoNotOptimize (output_data);
-    }
+    std::vector<float> output_data {};
+    output_data.resize (num_samples, 0.0f);
+
+    namespace chrono = std::chrono;
+    const auto start = chrono::high_resolution_clock::now();
+    ts_model.process (input_data, output_data);
+    const auto duration = chrono::high_resolution_clock::now() - start;
+
+    const auto audio_ms = static_cast<double> (num_samples) / fs * 1000.0;
+    const auto duration_ms = static_cast<double> (chrono::duration_cast<chrono::milliseconds> (duration).count());
+    std::cout << "Processed " << audio_ms << " ms of audio in " << duration_ms << " ms, "
+              << audio_ms / duration_ms << "x real-time" << std::endl;
 }
 
-static void ts_wdf (benchmark::State& state)
+void run_model_bench (std::string_view name)
 {
-    TS_WDF<float> ts_model;
-    run_model_bench (state, ts_model);
-}
-BENCHMARK (ts_wdf)->MinTime (5.0);
+    std::cout << "Running benchmark for model: " << name << std::endl;
 
-static void ts_mna (benchmark::State& state)
-{
-    TS_MNA<float> ts_model;
-    run_model_bench (state, ts_model);
-}
-BENCHMARK (ts_mna)->MinTime (5.0);
-
-static void ts_ndk (benchmark::State& state)
-{
-    TS_NDK ts_model;
+    TS_NDK ts_model {};
     ts_model.reset (fs);
-    ts_model.update_pots ({ TS_NDK::P1 * 0.1f + TS_NDK::R6 });
+    ts_model.update_pots ({ TS_NDK::R6 + TS_NDK::P1 * 0.1f });
 
-    std::array<double, num_samples> output_data {};
-    for (auto _ : state)
-    {
-        std::copy (input_data.begin(), input_data.end(), output_data.begin());
-        ts_model.process (output_data, 0);
-        benchmark::DoNotOptimize (output_data);
-    }
+    std::vector<double> output_data {};
+    output_data.resize (num_samples, 0.0f);
+    std::copy (input_data.begin(), input_data.end(), output_data.begin());
+
+    namespace chrono = std::chrono;
+    const auto start = chrono::high_resolution_clock::now();
+    ts_model.process (output_data, 0);
+    const auto duration = chrono::high_resolution_clock::now() - start;
+
+//    std::cout << "Final Sample: " << output_data.back() << std::endl;
+    const auto audio_ms = static_cast<double> (num_samples) / fs * 1000.0;
+    const auto duration_ms = static_cast<double> (chrono::duration_cast<chrono::milliseconds> (duration).count());
+    std::cout << "Processed " << audio_ms << " ms of audio in " << duration_ms << " ms, "
+              << audio_ms / duration_ms << "x real-time" << std::endl;
 }
-BENCHMARK (ts_ndk)->MinTime (5.0);
 
-static void ts_rnn (benchmark::State& state)
+int main()
 {
-    TS_RNN<24> ts_model { "model_best_24.json" };
-    run_model_bench (state, ts_model);
+    run_model_bench<TS_WDF<float>> ("WDF");
+    run_model_bench<TS_MNA<float>> ("MNA");
+    run_model_bench<TS_RNN<24>> ("RNN", "model_best_24.json");
+    run_model_bench ("NDK");
 }
-BENCHMARK (ts_rnn)->MinTime (5.0);
-
-BENCHMARK_MAIN();

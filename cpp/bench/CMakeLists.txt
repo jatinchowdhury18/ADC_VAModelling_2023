@@ -1,5 +1,4 @@
 add_executable(circuit_model_bench circuit_model_bench.cpp)
-target_link_libraries(circuit_model_bench PRIVATE benchmark::benchmark)
 
 # WDF Configuration
 target_link_libraries(circuit_model_bench PRIVATE chowdsp::chowdsp_wdf)
