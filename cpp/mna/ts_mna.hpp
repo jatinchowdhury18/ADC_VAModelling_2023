@@ -74,7 +74,7 @@ struct TS_MNA
                 const auto F_deriv = RP_recip + gC4 + (twoIs * Vt_recip) * cosh_Vd;
                 delta = F / F_deriv;
                 Vd -= delta;
-            } while (std::abs (delta) > (T) 1.0e-5 && ++nIters < 10);
+            } while (std::abs (delta) > (T) 1.0e-3 && ++nIters < 10);
 
             // update capacitor states
             const auto vC2 = Vi - Vplus;

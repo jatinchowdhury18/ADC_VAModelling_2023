@@ -27,6 +27,12 @@ CPMAddPackage(
     GIT_TAG main
     OPTIONS "RTNEURAL_XSIMD ON"
 )
+CPMAddPackage(
+    NAME benchmark
+    GITHUB_REPOSITORY google/benchmark
+    VERSION 1.5.2
+    OPTIONS "BENCHMARK_ENABLE_TESTING Off"
+)
 
 # Set up plotting tool
 add_executable(circuit_model_plotter circuit_model_plotter.cpp)
@@ -48,5 +54,6 @@ cmrc_add_resource_library(rnn-resources
 set_target_properties(rnn-resources PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 target_link_libraries(circuit_model_plotter PRIVATE RTNeural rnn-resources)
 
-# Configure data generator
+# Configure other targets...
 add_subdirectory(data_generator)
+add_subdirectory(bench)
