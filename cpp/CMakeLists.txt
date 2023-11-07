@@ -44,7 +44,6 @@ cmrc_add_resource_library(rnn-resources
     NAMESPACE rnn_files
     WHENCE rnn
     rnn/model_best_24.json
-    rnn/model_best_48.json
 )
 set_target_properties(rnn-resources PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 target_link_libraries(circuit_model_plotter PRIVATE RTNeural rnn-resources)

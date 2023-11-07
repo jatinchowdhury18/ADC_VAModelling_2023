@@ -41,7 +41,7 @@ struct TS_RNN
         {
             model_in[0] = 5.0f * (in_data[n] - 4.5f);
             out_data[n] = model.forward (model_in.data()) + model_in[0];
-            out_data[n] = out_data[n] * 6.25f + 4.5f;
+            out_data[n] = out_data[n] / 1.55f + 4.5f;
         }
     }
 

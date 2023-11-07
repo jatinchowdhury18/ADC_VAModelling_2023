@@ -45,7 +45,7 @@ int main (int argc, char* argv[])
             wdf_out.resize (data.size());
             ts_wdf.process (data, wdf_out);
 
-            const auto plot_name = "P1 = " + std::to_string (static_cast<int> (TS_WDF::Pot1 * distortion_val) / 1000) + " KOhms";
+            const auto plot_name = "P1 = " + std::to_string (static_cast<int> (TS_WDF<float>::Pot1 * distortion_val) / 1000) + " KOhms";
             plt::named_plot<float> (plot_name, wdf_out);
         }
     }
@@ -65,8 +65,8 @@ int main (int argc, char* argv[])
     }
     else if (std::string { argv[1] } == "--rnn")
     {
-        TS_RNN<48> ts_rnn { "model_best_48.json" };
-        for (auto distortion_val : { 0.0f, 0.4f, 1.0f })
+        TS_RNN<24> ts_rnn { "model_best_24.json" };
+        for (auto distortion_val : { 0.0f, 0.1f, 1.0f })
         {
             ts_rnn.set_distortion (distortion_val);
             ts_rnn.prepare (sample_rate);
@@ -74,7 +74,7 @@ int main (int argc, char* argv[])
             rnn_out.resize (data.size());
             ts_rnn.process (data, rnn_out);
 
-            const auto plot_name = "P1 = " + std::to_string (static_cast<int> (TS_WDF::Pot1 * distortion_val) / 1000) + " KOhms";
+            const auto plot_name = "P1 = " + std::to_string (static_cast<int> (TS_WDF<float>::Pot1 * distortion_val) / 1000) + " KOhms";
             plt::named_plot<float> (plot_name, rnn_out);
         }
     }
@@ -89,7 +89,7 @@ int main (int argc, char* argv[])
             mna_out.resize (data.size());
             ts_mna.process (data, mna_out);
 
-            const auto plot_name = "P1 = " + std::to_string (static_cast<int> (TS_WDF::Pot1 * distortion_val) / 1000) + " KOhms";
+            const auto plot_name = "P1 = " + std::to_string (static_cast<int> (TS_WDF<float>::Pot1 * distortion_val) / 1000) + " KOhms";
             plt::named_plot<float> (plot_name, mna_out);
         }
     }
