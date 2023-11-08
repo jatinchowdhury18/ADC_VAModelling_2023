@@ -72,6 +72,19 @@ int main()
 {
     run_model_bench<TS_WDF<float>> ("WDF");
     run_model_bench<TS_MNA<float>> ("MNA");
-    run_model_bench<TS_RNN<24>> ("RNN", "model_best_24.json");
+    run_model_bench<TS_RNN<12>> ("RNN-12", "model_best_12.json");
+    run_model_bench<TS_RNN<24>> ("RNN-24", "model_best_24.json");
     run_model_bench ("NDK");
 }
+
+// Results:
+// Running benchmark for model: WDF
+// Processed 200000 ms of audio in 1121 ms, 178.412x real-time
+// Running benchmark for model: MNA
+// Processed 200000 ms of audio in 977 ms, 204.708x real-time
+// Running benchmark for model: RNN-12
+// Processed 200000 ms of audio in 2073 ms, 96.4785x real-time
+// Running benchmark for model: RNN-24
+// Processed 200000 ms of audio in 4533 ms, 44.1209x real-time
+// Running benchmark for model: NDK
+// Processed 200000 ms of audio in 1819 ms, 109.951x real-time

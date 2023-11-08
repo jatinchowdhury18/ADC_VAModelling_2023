@@ -58,14 +58,14 @@ int main (int argc, char* argv[])
             ts_ndk.update_pots ({ TS_NDK::P1 * distortion_val + TS_NDK::R6 });
             std::vector<double> ndk_out { data.begin(), data.end() };
             std::transform (ndk_out.begin(), ndk_out.end(), ndk_out.begin(), [] (double x) { return (x - 4.5) * 0.25 + 4.5; });
-            ts_ndk.process (ndk_out, ndk_out, 0);
+            ts_ndk.process (ndk_out, 0);
             std::transform (ndk_out.begin(), ndk_out.end(), ndk_out.begin(), [] (double x) { return (x - 4.5) * 1.4 + 4.5; });
             plt::named_plot<double> ("Distortion: " + std::to_string (distortion_val), ndk_out);
         }
     }
     else if (std::string { argv[1] } == "--rnn")
     {
-        TS_RNN<24> ts_rnn { "model_best_24.json" };
+        TS_RNN<12> ts_rnn { "model_best_12.json" };
         for (auto distortion_val : { 0.0f, 0.1f, 1.0f })
         {
             ts_rnn.set_distortion (distortion_val);
