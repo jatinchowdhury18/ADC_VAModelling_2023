@@ -14,3 +14,9 @@ blackbox/sympy/main.py
 *.csv.bkup
 *.pkl
 __pycache__
+slides/package.json
+slides/package-lock.json
+blackbox/ADC_Training_Data/
+slides/package.json
+slides/package-lock.json
+blackbox/ADC_Training_Data/
