@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export_dir="slides/RTNeural_NAP"
+export_dir="slides/ADC_VAModelling_2023"
 
 npx slidev build --base /~jatin/${export_dir}
 

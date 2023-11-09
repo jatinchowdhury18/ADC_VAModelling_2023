@@ -6,3 +6,10 @@ build*/
 .DS_Store
 
 *_old/
+slides/package.json
+slides/package-lock.json
+blackbox/ADC_Training_Data/
+blackbox/sympy/main.py
+
+*.csv.bkup
+*.pkl

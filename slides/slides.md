@@ -59,6 +59,11 @@ hide: false
 ---
 
 ---
+src: ./pages/blackbox.md
+hide: false
+---
+
+---
 
 # Trying some features
 
