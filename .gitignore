@@ -13,3 +13,4 @@ blackbox/sympy/main.py
 
 *.csv.bkup
 *.pkl
+__pycache__
