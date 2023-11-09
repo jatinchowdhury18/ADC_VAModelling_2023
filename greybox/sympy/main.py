@@ -16,6 +16,33 @@ def extract_param(filename):
     return None
 
 
+def add_timesteps(data, num_timesteps):
+    """
+    Adds columns to the data for previous timesteps.
+
+    Parameters:
+    - data: The original data array.
+    - num_timesteps: The number of timesteps to include.
+
+    Returns:
+    - A new array with the additional timestep columns.
+    """
+    # Create a new array to hold the data with additional timesteps
+    num_rows = data.shape[0]
+    num_cols = data.shape[1] + num_timesteps
+    new_data = np.zeros((num_rows, num_cols))
+
+    # Fill in the original data
+    new_data[:, : data.shape[1]] = data
+
+    # Add the previous timesteps
+    for i in range(1, num_timesteps + 1):
+        # Shift data by i places, padding with zeros
+        new_data[i:, data.shape[1] + i - 1] = data[:-i, 0]
+
+    return new_data
+
+
 # Step 1: Read and Process Audio Files
 # Define your filenames
 filenames = [
@@ -64,15 +91,28 @@ for file in wav_files:
 # Convert to a NumPy array
 data_array = np.array(data)
 
-# Step 2: Prepare Data for PySR
-X = data_array[:, :2]  # input features
-y = data_array[:, 2]  # output feature
+# Use the function to add timesteps
+num_timesteps = 8  # Or any other integer you want to specify
+extended_data_array = add_timesteps(data_array, num_timesteps)
+
+# export extended_data_array to csv
+np.savetxt(
+    "blackbox/ADC_Training_Data/extended_data_array.csv",
+    extended_data_array,
+    delimiter=",",
+)
+
+# Now, prepare the data for PySR
+X = np.concatenate(
+    (extended_data_array[:, :2], extended_data_array[:, 3:]), axis=1
+)  # input features, with additional timesteps
+y = extended_data_array[:, 2]  # output feature, same as before
 
 # Step 3: Run PySR
 # Initialize PySR model with desired options
 model = PySRRegressor(
-    niterations=5,
-    population_size=20,
+    niterations=10,
+    population_size=30,
     binary_operators=["*", "+", "-", "/"],
     unary_operators=[
         "cos",

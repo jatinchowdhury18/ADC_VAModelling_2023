@@ -1,9 +1,0 @@
-Complexity,Loss,Equation
-1,0.33877516,"x0"
-2,0.27008092,"cube(x0)"
-3,0.23331894,"cube(erf(x0))"
-4,0.23293576,"erf(cube(erf(x0)))"
-6,0.23284109,"sin(erf(erf(cube(erf(x0)))))"
-7,0.23266588,"(tanh(cube(erf(sin(x0)))) * 1.3857359)"
-8,0.2322993,"log(exp(square(tanh(x0)) * sign(x0)))"
-9,0.23200722,"((erf(x0 / erf(0.719768)) * -0.4266788) + x0)"

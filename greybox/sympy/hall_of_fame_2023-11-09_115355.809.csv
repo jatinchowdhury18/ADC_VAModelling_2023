@@ -1,4 +1,0 @@
-Complexity,Loss,Equation
-1,0.00056811975,"x5"
-3,0.0005679817,"(x5 * 0.9996484)"
-7,7.549257e-5,"tanh(atanh_clip(x5) + (x4 - x3))"
