@@ -13,6 +13,221 @@ Previously, at ADC 2020:
   - Modified Nodal Analysis
 
 </v-clicks>
+  
+---
+
+# Modified Nodal Analysis
+
+Review of circuit rules:
+
+<v-clicks>
+
+$$ \text{Ohm's Law: } v_R = i_R R $$
+$$ \text{Kirchoff's Current Law (KCL): } \sum_{k=1}^n i_k = 0 $$
+$$ \text{Capacitor Voltage Law: } v_C(t) = \frac{Q_C(t)}{C} = \frac{1}{C} \int i_C(t) dt $$
+$$ \text{ Ideal Op-Amp Laws: } v^+ = v^-; \; i^+ = i^- = 0  $$
+
+</v-clicks>
+
+---
+
+# Modified Nodal Analysis
+
+[Capacitor discretization](https://cytomic.com/files/dsp/OnePoleLinearLowPass.pdf):
+
+<v-clicks>
+
+$$ \text{Trapezoidal Rule: } \int_a^b f(x) dx \approx (b-a) * \frac{1}{2} (f(b) + f(a)) $$
+$$ v_C(t) = \frac{1}{C} \int i_C(t) dt \rarr v_C[n] = v_C[n-1] + \frac{T}{C} * \frac{1}{2} (i_C[n] + i_C[n-1]) $$
+$$ \text{Capacitor ``admittance'': } G_C = \frac{2 C}{T} = 2 f_s C \\
+\text{Capacitor ``state'': } i_{C_{eq}}[n] = G_C v_C[n] + i_C[n] $$
+
+<!-- <div>
+
+- $G_C$ is more of an "algebraic" admittance than a "physical" admittance.
+- $i_{c_{eq}}$ can be thought of as an added current due to the capacitor charge from the previous sample.
+
+</div> -->
+
+<div>
+<br/>
+
+<div style="border:2px solid #FFFFFF">
+
+$$ \text{Voltage-Current relation: } i_C[n] = G_C v_C[n] - i_{C_{eq}}[n-1] $$
+$$ \text{State update: } i_{C_{eq}}[n] = 2 G_C v_C[n] - i_{C_{eq}}[n-1] $$
+
+</div>
+</div>
+
+</v-clicks>
+
+---
+
+# Modified Nodal Analysis
+
+<div class="grid grid-cols-2 gap-2">
+<div>
+<img src="/mna_subschematic_C2R5.svg"/>
+<v-clicks>
+
+$$ i_{R5} = \frac{v^+ - v_b}{R_5} $$
+$$ i_{C2} = 2 f_s C_2 (v_i - v^+) - i_{C2_{eq}} $$
+$$ i_{C2} - i_{R5} = 0 \text{ (KCL)} $$
+
+<div>
+
+Solve for $v^+$ in terms of $v_i$
+$$ v^+ = \frac{2 f_s C_2 R_5 v_i - R_5 i_{C2_{eq}} + v_b}{1 + 2 f_s C_2 R_5} $$
+
+</div>
+</v-clicks>
+</div>
+<div>
+<v-clicks>
+
+```cpp
+struct Overdrive_MNA {
+    float gC2 = 2.0f * fs * C2;
+    float gC2_R5_recip = 1.0f / (1.0f + gC2 * R5);
+    float iC2eq = 0.0f;
+    
+    float process_sample (float Vi) {
+        // compute Vplus from Vi
+        const auto Vplus = (gC2 * R5 * Vi - R5 * iC2eq + Vb) * gC2_R5_recip;
+        
+        // update capacitor states
+        const auto vC2 = Vi - Vplus;
+        iC2eq = 2.0f * gC2 * vC2 - iC2eq;
+        
+        return Vplus;
+    }
+};
+```
+
+<div style="margin-top:-75%;z-index:2;position:relative">
+<img src="/mna_vplus_plot.png" style="margin-left:auto;margin-right:auto;width=10%">
+</div>
+
+</v-clicks>
+</div>
+</div>
+
+---
+
+# Modified Nodal Analysis
+
+<div class="grid grid-cols-2 gap-2">
+<div>
+<img src="/mna_subschematic_C3R4.svg" style="margin-left:auto;margin-right:auto"/>
+<v-clicks>
+
+$$ i_{C3} = 2 f_s C_3 (V^- - V_4) - i_{C3_{eq}} $$
+$$ i_{R4} = i_{C3} = \frac{V_4 - 0}{R_4} $$
+
+<div>
+
+Solve for $i_{C3}$ in terms of $v^-$
+$$ i_{C3} = \frac{2 f_s C_3 v^- - i_{C3_{eq}}}{1 + 2 f_s C_3 R_4} $$
+
+</div>
+</v-clicks>
+</div>
+<div>
+<v-clicks>
+
+```cpp
+struct Overdrive_MNA {
+    // ...
+    float gC3 = 2.0f * fs * C3;
+    float gC3_recip = 1.0f / gC3;
+    float gC3_R4_recip = 1.0f / (1.0f + gC3 * R4);
+    float iC3eq = 0.0f;
+    
+    float process_sample (float Vi) {
+        // compute Vplus from Vi
+        const auto Vplus = (gC2 * R5 * Vi - R5 * iC2eq + Vb) * gC2_R5_recip;
+        
+        const auto Vminus = Vplus; // (op-amp rule)
+        
+        // compute i_C3 (same as i_R4)
+        const auto iC3 = (gC3 * Vminus - iC3eq) * gC3_R4_recip;
+        
+        // update capacitor states
+        const auto vC2 = Vi - Vplus;
+        iC2eq = 2.0f * gC2 * vC2 - iC2eq;
+        const auto vC3 = (iC3 + iC3eq) * gC3_recip;
+        iC3eq = 2.0f * gC3 * vC3 - iC3eq;
+    }
+};
+```
+
+</v-clicks>
+</div>
+</div>
+
+---
+
+# Modified Nodal Analysis
+
+<div class="grid grid-cols-2 gap-2">
+<div>
+
+<v-clicks>
+
+$$ i_{C3} = i_{RP} + i_{DP} + i_{C4} \text{ (KCL)} $$
+$$ i_{DP} = 2 I_s * \sinh \left(\frac{v_{DP}}{v_T \eta} \right) \text{(Shockley diode model)} $$
+$$ i_{C3} = \frac{v_{DP}}{R_6 + P_1} + 2 I_s * \sinh \left(\frac{v_{DP}}{v_T \eta} \right) + 2 f_s C_4 v_{DP} - i_{C4_{eq}} $$
+
+Solve for $v_{DP}$ with a Newton-Raphson solver:
+$$ F(v_{DP}) = \frac{v_{DP}}{R_6 + P_1} + 2 I_s * \sinh \left(\frac{v_{DP}}{v_T \eta} \right) + 2 f_s C_4 v_{DP} - i_{C4_{eq}} - i_{C3} = 0 $$
+$$ F'(v_{DP}) = \frac{1}{R_6 + P_1} + \frac{2 I_s}{v_T \eta} * \cosh \left(\frac{v_{DP}}{v_T \eta} \right) + 2 f_s C_4 $$
+
+$$ v_{DP}^{k+1} = v_{DP}^k - \frac{F(v_{DP})}{F'(v_{DP})} $$
+
+</v-clicks>
+</div>
+<div>
+<img src="/mna_subschematic_FB.svg" style="margin-left:auto;margin-right:auto;height:55%"/>
+</div>
+</div>
+
+---
+
+# Modified Nodal Analysis
+
+```cpp
+struct Overdrive_MNA {
+    // ...
+    float RP_recip = 1.0f / (R6 + 0.1f * P1);
+    float gC4 = 2.0f * fs * C4;
+    float iC4eq = 0.0f;
+    float Vd = 0.0f;
+    
+    float process_sample (float Vi) {
+        // ...
+        int nIters = 0;
+        float delta;
+        do {
+            const auto [sinh_Vd, cosh_Vd] = sinh_cosh (Vd * Vt_recip);
+            const auto F = Vd * RP_recip + gC4 * Vd - iC4eq - iC3 + twoIs * sinh_Vd;
+            const auto F_deriv = RP_recip + gC4 + (twoIs * Vt_recip) * cosh_Vd;
+            delta = F / F_deriv;
+            Vd -= delta;
+        } while (std::abs (delta) > 1.0e-3f && ++nIters < 10);
+        
+        // update capacitor states
+        // ...
+        iC4eq = 2.0f * gC4 * Vd - iC4eq;
+    }
+};
+```
+
+---
+
+# Modified Nodal Analysis
+
+<img src="/ts_mna_plot.png" style="margin-left:auto;margin-right:auto;height:90%">
 
 ---
 
@@ -240,232 +455,6 @@ Code generation from a JSON "configuration":
 # Nodal DK Method
 
 <img src="/ts_ndk_plot.png" style="margin-left:auto;margin-right:auto;height:90%">
-
----
-
-# Modified Nodal Analysis
-
-- More "direct" than NDK method
-- ...
-- Can also be auto-generated
-- References:
-  - Eric Tarr
-  - Andy Simper
-  
----
-
-# Modified Nodal Analysis
-
-Review of circuit rules:
-
-<v-clicks>
-
-$$ \text{Ohm's Law: } v_R = i_R R $$
-$$ \text{Kirchoff's Current Law (KCL): } \sum_{k=1}^n i_k = 0 $$
-$$ \text{Capacitor Voltage Law: } v_C(t) = \frac{Q_C(t)}{C} = \frac{1}{C} \int i_C(t) dt $$
-$$ \text{ Ideal Op-Amp Laws: } v^+ = v^-; \; i^+ = i^- = 0  $$
-
-</v-clicks>
-
----
-
-# Modified Nodal Analysis
-
-[Capacitor discretization](https://cytomic.com/files/dsp/OnePoleLinearLowPass.pdf):
-
-<v-clicks>
-
-$$ \text{Trapezoidal Rule: } \int_a^b f(x) dx \approx (b-a) * \frac{1}{2} (f(b) + f(a)) $$
-$$ v_C(t) = \frac{1}{C} \int i_C(t) dt \rarr v_C[n] = v_C[n-1] + \frac{T}{C} * \frac{1}{2} (i_C[n] + i_C[n-1]) $$
-$$ \text{Capacitor ``admittance'': } G_C = \frac{2 C}{T} = 2 f_s C \\
-\text{Capacitor ``state'': } i_{C_{eq}}[n] = G_C v_C[n] + i_C[n] $$
-
-<!-- <div>
-
-- $G_C$ is more of an "algebraic" admittance than a "physical" admittance.
-- $i_{c_{eq}}$ can be thought of as an added current due to the capacitor charge from the previous sample.
-
-</div> -->
-
-<div>
-<br/>
-
-<div style="border:2px solid #FFFFFF">
-
-$$ \text{Voltage-Current relation: } i_C[n] = G_C v_C[n] - i_{C_{eq}}[n-1] $$
-$$ \text{State update: } i_{C_{eq}}[n] = 2 G_C v_C[n] - i_{C_{eq}}[n-1] $$
-
-</div>
-</div>
-
-</v-clicks>
-
----
-
-# Modified Nodal Analysis
-
-<div class="grid grid-cols-2 gap-2">
-<div>
-<img src="/mna_subschematic_C2R5.svg"/>
-<v-clicks>
-
-$$ i_{R5} = \frac{v^+ - v_b}{R_5} $$
-$$ i_{C2} = 2 f_s C_2 (v_i - v^+) - i_{C2_{eq}} $$
-$$ i_{C2} - i_{R5} = 0 \text{ (KCL)} $$
-
-<div>
-
-Solve for $v^+$ in terms of $v_i$
-$$ v^+ = \frac{2 f_s C_2 R_5 v_i - R_5 i_{C2_{eq}} + v_b}{1 + 2 f_s C_2 R_5} $$
-
-</div>
-</v-clicks>
-</div>
-<div>
-<v-clicks>
-
-```cpp
-struct Overdrive_MNA {
-    float gC2 = 2.0f * fs * C2;
-    float gC2_R5_recip = 1.0f / (1.0f + gC2 * R5);
-    float iC2eq = 0.0f;
-    
-    float process_sample (float Vi) {
-        // compute Vplus from Vi
-        const auto Vplus = (gC2 * R5 * Vi - R5 * iC2eq + Vb) * gC2_R5_recip;
-        
-        // update capacitor states
-        const auto vC2 = Vi - Vplus;
-        iC2eq = 2.0f * gC2 * vC2 - iC2eq;
-        
-        return Vplus;
-    }
-};
-```
-
-<div style="margin-top:-75%;z-index:2;position:relative">
-<img src="/mna_vplus_plot.png" style="margin-left:auto;margin-right:auto;width=10%">
-</div>
-
-</v-clicks>
-</div>
-</div>
-
----
-
-# Modified Nodal Analysis
-
-<div class="grid grid-cols-2 gap-2">
-<div>
-<img src="/mna_subschematic_C3R4.svg" style="margin-left:auto;margin-right:auto"/>
-<v-clicks>
-
-$$ i_{C3} = 2 f_s C_3 (V^- - V_4) - i_{C3_{eq}} $$
-$$ i_{R4} = i_{C3} = \frac{V_4 - 0}{R_4} $$
-
-<div>
-
-Solve for $i_{C3}$ in terms of $v^-$
-$$ i_{C3} = \frac{2 f_s C_3 v^- - i_{C3_{eq}}}{1 + 2 f_s C_3 R_4} $$
-
-</div>
-</v-clicks>
-</div>
-<div>
-<v-clicks>
-
-```cpp
-struct Overdrive_MNA {
-    // ...
-    float gC3 = 2.0f * fs * C3;
-    float gC3_recip = 1.0f / gC3;
-    float gC3_R4_recip = 1.0f / (1.0f + gC3 * R4);
-    float iC3eq = 0.0f;
-    
-    float process_sample (float Vi) {
-        // compute Vplus from Vi
-        const auto Vplus = (gC2 * R5 * Vi - R5 * iC2eq + Vb) * gC2_R5_recip;
-        
-        const auto Vminus = Vplus; // (op-amp rule)
-        
-        // compute i_C3 (same as i_R4)
-        const auto iC3 = (gC3 * Vminus - iC3eq) * gC3_R4_recip;
-        
-        // update capacitor states
-        const auto vC2 = Vi - Vplus;
-        iC2eq = 2.0f * gC2 * vC2 - iC2eq;
-        const auto vC3 = (iC3 + iC3eq) * gC3_recip;
-        iC3eq = 2.0f * gC3 * vC3 - iC3eq;
-    }
-};
-```
-
-</v-clicks>
-</div>
-</div>
-
----
-
-# Modified Nodal Analysis
-
-<div class="grid grid-cols-2 gap-2">
-<div>
-
-<v-clicks>
-
-$$ i_{C3} = i_{RP} + i_{DP} + i_{C4} \text{ (KCL)} $$
-$$ i_{DP} = 2 I_s * \sinh \left(\frac{v_{DP}}{v_T \eta} \right) \text{(Shockley diode model)} $$
-$$ i_{C3} = \frac{v_{DP}}{R_6 + P_1} + 2 I_s * \sinh \left(\frac{v_{DP}}{v_T \eta} \right) + 2 f_s C_4 v_{DP} - i_{C4_{eq}} $$
-
-Solve for $v_{DP}$ with a Newton-Raphson solver:
-$$ F(v_{DP}) = \frac{v_{DP}}{R_6 + P_1} + 2 I_s * \sinh \left(\frac{v_{DP}}{v_T \eta} \right) + 2 f_s C_4 v_{DP} - i_{C4_{eq}} - i_{C3} = 0 $$
-$$ F'(v_{DP}) = \frac{1}{R_6 + P_1} + \frac{2 I_s}{v_T \eta} * \cosh \left(\frac{v_{DP}}{v_T \eta} \right) + 2 f_s C_4 $$
-
-$$ v_{DP}^{k+1} = v_{DP}^k - \frac{F(v_{DP})}{F'(v_{DP})} $$
-
-</v-clicks>
-</div>
-<div>
-<img src="/mna_subschematic_FB.svg" style="margin-left:auto;margin-right:auto;height:55%"/>
-</div>
-</div>
-
----
-
-# Modified Nodal Analysis
-
-```cpp
-struct Overdrive_MNA {
-    // ...
-    float RP_recip = 1.0f / (R6 + 0.1f * P1);
-    float gC4 = 2.0f * fs * C4;
-    float iC4eq = 0.0f;
-    float Vd = 0.0f;
-    
-    float process_sample (float Vi) {
-        // ...
-        int nIters = 0;
-        float delta;
-        do {
-            const auto [sinh_Vd, cosh_Vd] = sinh_cosh (Vd * Vt_recip);
-            const auto F = Vd * RP_recip + gC4 * Vd - iC4eq - iC3 + twoIs * sinh_Vd;
-            const auto F_deriv = RP_recip + gC4 + (twoIs * Vt_recip) * cosh_Vd;
-            delta = F / F_deriv;
-            Vd -= delta;
-        } while (std::abs (delta) > 1.0e-5f && ++nIters < 10);
-        
-        // update capacitor states
-        // ...
-        iC4eq = 2.0f * gC4 * Vd - iC4eq;
-    }
-};
-```
-
----
-
-# Modified Nodal Analysis
-
-<img src="/ts_mna_plot.png" style="margin-left:auto;margin-right:auto;height:90%">
 
 ---
 

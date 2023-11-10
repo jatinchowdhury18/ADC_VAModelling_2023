@@ -19,10 +19,14 @@ drawings:
 css: unocss
 
 layout: image
-image: /Background.jpeg # @TODO: replcae the cover image
+image: /background.jpeg # @TODO: replcae the cover image
 ---
 
-<!-- COVER PAGE -->
+<br/>
+<h1 style="color:black">A Comparison of Virtual Analog Modelling Techniques</h1>
+
+<br/>
+<h5 style="color:black">Jatin Chowdhury and Christopher Clarke</h5>
 
 ---
 
@@ -37,6 +41,20 @@ image: /Background.jpeg # @TODO: replcae the cover image
   - [Chow Tape Model](https://github.com/jatinchowdhury18/AnalogTapeModel)
   - [BYOD](https://github.com/Chowdhury-DSP/BYOD)
   - [Chow Matrix](https://github.com/Chowdhury-DSP/ChowMatrix)
+</div>
+<div>
+<img src="/headshot.jpg"/>
+</div>
+</div>
+
+---
+
+# Hello!
+
+<div grid="~ cols-2 gap-4">
+<div>
+
+Chris info here...
 </div>
 <div>
 <img src="/headshot.jpg"/>
