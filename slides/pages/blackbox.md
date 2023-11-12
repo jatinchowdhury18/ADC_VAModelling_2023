@@ -53,6 +53,12 @@ BABY Audio's TAIP is a tape emulation VST plugin that brings the true sound and 
 </span>
 
 ---
+
+# Overdrive Circuit RNN Implementation
+
+<img src="/ts_rnn_plot.png" style="margin-left:auto;margin-right:auto;height:90%">
+
+---
 class: flex justify-center items-center
 ---
 

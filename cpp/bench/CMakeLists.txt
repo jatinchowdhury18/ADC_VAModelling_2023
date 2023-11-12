@@ -9,3 +9,6 @@ target_link_libraries(circuit_model_bench PRIVATE Eigen3::Eigen)
 
 # RNN Configuration
 target_link_libraries(circuit_model_bench PRIVATE RTNeural rnn-resources)
+
+# DWDF Configuration
+target_link_libraries(circuit_model_bench PRIVATE RTNeural dwdf-resources)

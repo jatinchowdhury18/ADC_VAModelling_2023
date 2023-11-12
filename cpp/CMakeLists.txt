@@ -49,6 +49,15 @@ cmrc_add_resource_library(rnn-resources
 set_target_properties(rnn-resources PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 target_link_libraries(circuit_model_plotter PRIVATE RTNeural rnn-resources)
 
+# DWDF Configuration
+cmrc_add_resource_library(dwdf-resources
+    NAMESPACE dwdf_files
+    WHENCE wdf
+    wdf/1N4148_2x8.json
+)
+set_target_properties(dwdf-resources PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+target_link_libraries(circuit_model_plotter PRIVATE dwdf-resources)
+
 # Configure other targets...
 add_subdirectory(data_generator)
 add_subdirectory(bench)

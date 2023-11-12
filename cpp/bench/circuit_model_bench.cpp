@@ -70,10 +70,11 @@ void run_model_bench (std::string_view name)
 
 int main()
 {
-    run_model_bench<TS_WDF<float>> ("WDF");
+    run_model_bench<TS_WDF<WDF_Mode::WDF, float>> ("WDF");
     run_model_bench<TS_MNA<float>> ("MNA");
     run_model_bench<TS_RNN<12>> ("RNN-12", "model_best_12.json");
     run_model_bench<TS_RNN<24>> ("RNN-24", "model_best_24.json");
+    run_model_bench<TS_WDF<WDF_Mode::DWDF, float>> ("DWDF");
     run_model_bench ("NDK");
 }
 
@@ -86,5 +87,7 @@ int main()
 // Processed 200000 ms of audio in 2073 ms, 96.4785x real-time
 // Running benchmark for model: RNN-24
 // Processed 200000 ms of audio in 4533 ms, 44.1209x real-time
+// Running benchmark for model: DWDF
+// Processed 200000 ms of audio in 1581 ms, 126.502x real-time4
 // Running benchmark for model: NDK
 // Processed 200000 ms of audio in 1819 ms, 109.951x real-time

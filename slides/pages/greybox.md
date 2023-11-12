@@ -51,3 +51,9 @@ class: flex justify-center items-center
 
 </div>
 </div>
+
+---
+
+# Overdrive Circuit DWDF Implementation
+
+<img src="/ts_dwdf_plot.png" style="margin-left:auto;margin-right:auto;height:90%">

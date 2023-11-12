@@ -1,11 +1,63 @@
 #pragma once
 
+#include <RTNeural/RTNeural.h>
 #include <chowdsp_wdf/chowdsp_wdf.h>
+#include <cmrc/cmrc.hpp>
 #include <span>
+
+CMRC_DECLARE (dwdf_files);
 
 namespace wdft = chowdsp::wdft;
 
-template <typename T = float>
+enum class WDF_Mode
+{
+    WDF,
+    DWDF,
+};
+
+template <typename T, typename Next>
+struct DWDF_Diode_Pair : public wdft::RootWDF
+{
+    explicit DWDF_Diode_Pair (Next& n) : next (n)
+    {
+        const auto fs = cmrc::dwdf_files::get_filesystem();
+        const auto model_file = fs.open ("1N4148_2x8.json");
+        const auto model_json = nlohmann::json::parse (std::string_view { model_file.begin(), model_file.size() });
+        model.parseJson (model_json, false);
+    }
+
+    void calcImpedance() override { logR = std::log (next.wdf.R); }
+
+    inline void incident (float x) { wdf.a = x; }
+
+    inline float reflected()
+    {
+        const T inData alignas (16)[xsimd::batch<T>::size] = { wdf.a, logR };
+        wdf.b = -model.template forward (inData);
+        return wdf.b;
+    }
+
+    wdft::WDFMembers<float> wdf;
+
+private:
+    const Next& next;
+    float logR = 1.0f;
+
+    static constexpr int hidden_size = 8;
+    RTNeural::ModelT<T,
+                     2,
+                     1,
+                     RTNeural::DenseT<float, 2, hidden_size>,
+                     RTNeural::TanhActivationT<T, hidden_size>,
+                     RTNeural::DenseT<float, hidden_size, hidden_size>,
+                     RTNeural::TanhActivationT<T, hidden_size>,
+                     RTNeural::DenseT<float, hidden_size, hidden_size>,
+                     RTNeural::TanhActivationT<T, hidden_size>,
+                     RTNeural::DenseT<float, hidden_size, 1>>
+        model;
+};
+
+template <WDF_Mode mode = WDF_Mode::WDF, typename T = float>
 struct TS_WDF
 {
     void prepare (double sample_rate)
@@ -31,8 +83,16 @@ struct TS_WDF
         {
             Vin_C2.setVoltage (in_data[n]);
 
-            dp.incident (P3.reflected());
-            P3.incident (dp.reflected());
+            if constexpr (mode == WDF_Mode::WDF)
+            {
+                dp.incident (P3.reflected());
+                P3.incident (dp.reflected());
+            }
+            else if constexpr (mode == WDF_Mode::DWDF)
+            {
+                dp_neural.incident (P3.reflected());
+                P3.incident (dp_neural.reflected());
+            }
 
             out_data[n] = wdft::voltage<T> (RL);
         }
@@ -82,4 +142,6 @@ struct TS_WDF
 
     static constexpr auto Vt = (T) 26.0e-3;
     wdft::DiodePairT<T, decltype (P3)> dp { P3, (T) 4.352e-9, Vt, (T) 1.906 }; // 1N4148
+
+    DWDF_Diode_Pair<T, decltype (P3)> dp_neural { P3 };
 };
