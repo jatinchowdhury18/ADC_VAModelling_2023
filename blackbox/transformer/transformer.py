@@ -29,10 +29,10 @@ print(y_test.shape)
 # Assuming X_train, y_train, X_test, y_test are numpy arrays that are available from the previous code snippet
 
 # Hyperparameters
-d_model = 64
-nhead = 10
-num_encoder_layers = 2
-dim_feedforward = 32
+d_model = 8
+nhead = 2
+num_encoder_layers = 8
+dim_feedforward = 8
 dropout = 0.1
 batch_size = 1024
 learning_rate = 0.001
