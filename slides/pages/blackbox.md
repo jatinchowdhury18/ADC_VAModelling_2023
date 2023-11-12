@@ -53,92 +53,231 @@ BABY Audio's TAIP is a tape emulation VST plugin that brings the true sound and 
 </span>
 
 ---
+class: flex justify-center items-center
+---
 
+# LACTOSE
 
+---
 
 # Conditional Models & LACTOSE Algorithm
-### Background Overview
-
----
+<div grid="~ cols-2 gap-4">
+<div>
 
 <span class="text-sm">
 
-# Difficulties in Conditional Models
+### Background/Overview
+- Some ML methods do not require backpropagation (Markov Modelling, Decision Trees)
+- Proposed methods
+  - Conditional Modelling (CM) -  Conditional Random Fields (CRF)
+  - Conditional Neural Processes (CNP) - similar to Gaussian Process/Bayesian Methods
+  - Conditional VAEs | Conditional seq2seq
+
+</span>
+</div>
+<div>
+
+### Difficulties in Conditional Models
+
 - Traditional neural networks struggle with conditional statements within the graph.
 - Backpropagation is hindered by branching conditions.
-- LACTOSE stores parameters for numerical ranges, handling separate error backpropagation.
+- Conditional statements present unique challenges, especially in the circunmstances presented in audio.
+</div> 
+</div>
 
-Note: Conditional statements present unique challenges, especially in DDSP.
+<img src="/conditionalinorout.png" style="margin-left:auto;margin-right:auto;width:50%">
 
-</span>
 
 ---
 
-<span class="text-sm">
+<div grid="~ cols-2 gap-4">
+<div>
 
 # Addressing with LACTOSE
-- LACTOSE enables differentiable "if" conditions, crucial for DDSP.
+- Linear Array of Conditions, TOpologies with Separated Error-backpropagation (LACTOSE)
+- LACTOSE enables differentiable "if" conditions, which can allow the use of these in various architectures.
 - Employs a dynamic parameter loading strategy during prediction.
+- In theory, this would allow each model to be smaller in size -- Needs to bound less parameter space
 
-<br>
+</div>
 
-<figure style="margin-left:auto;margin-right:auto;width:50%">
+  <div>
+
+<figure style="margin-left:auto;margin-right:auto;width:70%">
 <!-- <img src="/ts_schematic_wdf_nodes.svg" style="margin-left:auto;margin-right:auto"> -->
     <img src="/CombinedParameterSpace.png" />
-    <figcaption>A visualisation of dimension-reduced model parameter space encompassing all conditions.</figcaption>
+    <figcaption>A visualisation of model parameter space encompassing vs. separated conditions.</figcaption>
 </figure>
+    <img src="/SeparatedParameterSpace.png" style="margin-left:auto;margin-right:auto;width:70%">
 
-</span>
+  </div>
+</div>
 
 
 ---
 
-<span class="text-sm">
 
-# Beyond LACTOSE
-- Decision Trees & Markov Models bypass the issue (no error-backpropagation needed).
-- Conditional Neural Processes (CNPs) and Variational Autoencoders also utilize conditions.
-- The model parameter space increases with more separated conditions.
-
-<figure>
-  <img src="Figures/SeparatedParameterSpace.png" alt="Separated Parameter Space" width="100%">
-  <figcaption>Separated parameter spaces for each condition in LACTOSE.</figcaption>
-</figure>
-
-</span>
-
----
+<div grid="~ cols-2 gap-4">
+<div>
 
 <span class="text-sm">
 
 # LACTOSE Algorithm in Practice
 - Overcomes issues with non-zero gradients in conditional branches.
-- Implemented in Tensorflow, it uses an array of conditions and a dataset as input.
 - Conditions and model parameters are stored externally to the Tensorflow graph.
 
-<figure>
-  <img src="Figures/ModelV2.png" alt="LACTOSE Model" width="100%">
-  <figcaption>Procedures behind the LACTOSE algorithm with an external conditions host.</figcaption>
-</figure>
+</span>
+
+$$
+\begin{equation}
+    y = \begin{cases}
+        0.25x - 0.25  & \text{if } x \leq -0.5         \\
+        0.5x  - 0.125 & \text{if } -0.5 < x \leq -0.25 \\
+        x             & \text{if } -0.25 < x \leq 0.25 \\
+        0.5x + 0.125  & \text{if } 0.25 < x \leq 0.5   \\
+        0.25x + 0.25  & \text{if } x > 0.5
+    \end{cases}
+\end{equation}
+$$
+
+Dataset was prepared 7.2e5 samples, LACTOSE model: 4x4, non-LACTOSE 8x8. 4x4 non-LACTOSE was not able to train. ReLU activation fn. 
+</div>
+
+<div>
+
+<img src="/ModelV2.png" style="margin-left:auto;margin-right:auto;width:85%">
+
+``` c
+While Train==True:
+  // ModelInput: x
+  // ModelOutput: y
+  IF x = C_n // check across all conditions
+  RETURN θ_n
+  ENDIF
+
+  Model <-- θ_n
+  Prediction ^y = Model(x, θ_n)
+  Loss = LossFunction(y, ^y)
+  Optimizer <-- Loss
+  Save(ModelParams: C_n)
+
+```
+</div>
+
+</div>
+
+---
+
+# LACTOSE Results & Computational Cost
+<div grid="~ cols-2 gap-4">
+<div>
+<span class="text-sm">
+
+- Evaluated on a dataset with a piecewise linear transfer function.
+  - Noticed that this works best for static nonlinearities, in order to keep the model size small.
+
+- 720,000 samples split into 80% training, 20% testing.
+- Outperforms an MLP in efficiency with reduced parameter space.
+
+| Model   | Total Duration   | Mean Duration/Samp. | Realtime Score   |
+|---------|------------------|---------------------|------------------|
+| LACTOSE | 1.87e-2 seconds  | 1.62e-10 seconds    | 535.48×          |
+| MLP     | 3.80e-2 seconds  | 3.3e-10 seconds     | 263.00×          |
+
+
+</span>
+</div>
+
+<div>
+<img src="/modelcompareLACTOSE.png" style="margin-left:auto;margin-right:auto;width:95%">
+
+This benchmark was produced on a 2018 Mac Mini, with a 3.2 GHz 6-core Intel Core i7 CPU with AVX instructions enabled (RTNeural).
+</div>
+</div>
+
+
+---
+class: flex justify-center items-center
+---
+
+# Transformer Model
+
+---
+
+
+<div grid="~ cols-3 gap-4">
+<div>
+
+## Transformer Model
+```mermaid {scale: 0.5}
+graph TD
+    A[Input] -->|Linear Transformation| B[Linear Encoder]
+    B -->|Adds Positional Info| C[Positional Encoding]
+    C -->|Transforms Data| D[Transformer Encoder Layer 1]
+    D --> E[Transformer Encoder Layer 2]
+    E --> F[/.../]
+    F --> G[Transformer Encoder Layer N]
+    G -->|Linear Transformation| H[Linear Decoder]
+    H -->|Calculates Loss| I[MSE Loss]
+```
+</div>
+
+<div>
+
+<span class="text-sm">
+
+##### Linear Encoder
+- A dense layer that projects the input features into a higher-dimensional space suitable for the transformer.
+
+##### Positional Encoding (PE)
+- Infuses the input with positional data to maintain sequence information.
+
+##### Transformer Encoder Layers
+- Comprised of N layers (in this case, 8), each transformer encoder layer further processes the data, applying self-attention mechanisms and feedforward neural networks.
+
+##### Linear Decoder
+- Converts the high-dimensional output of the last encoder layer back into the original feature space, in this case, predicting a single continuous value.
+
+</span>
+
+</div>
+
+<div>
+
+<span class="text-sm">
+
+##### Sine-cosine PE
+- Sine-cosine positional encoding gives unique positional identifiers to sequence elements using alternating sine and cosine functions, enabling a model to understand the order of inputs.
+
+- Applied to audio, this allows the model to recognize the order and temporal markers associated to the audio samples.
+
+</span>
+</div>
+
+</div>
+
+---
+
+## Transformer Results and Discussion
+<span class="text-sm">
+
+- Transformers are typically known for their generative ability. However, in the case of learning the mapping of the Tubescreamer clipping stage, the results show that more work was necessitated. The above image is a smaller transformer (2 enc layers, dim=4) and the bottom is a larger transformer (8 enc layers, dim=8)
+
+</span>
+
+<img src="/transformer_10epochs.png" style="margin-left:auto;margin-right:auto;width:45%">
+<img src="/transformer.png" style="margin-left:auto;margin-right:auto;width:45%">
+
+<span class="text-sm">
+
+- These results indicate that a larger transformer model is required to model the underlying mapping of the clipping stage. Or datum that span a larger distribution of the required space.
+
+- Note on Generative Ability: Although the replication of the TS clipping stage might not be as good as other models, it is possible that there are other latent abilities the transformer model is capable of, even at low parameter count.
 
 </span>
 
 ---
 
-<span class="text-sm">
 
-# LACTOSE Results & Computational Cost
-- Evaluated on a dataset with a piecewise linear transfer function.
-- 720,000 samples split into 80% training, 20% testing.
-- Outperforms an MLP in efficiency with reduced parameter space.
-
-<figure>
-  <img src="/Figures/transferfunctionLACTOSE.png" alt="LACTOSE Transfer Function" width="50%">
-  <figcaption>Piecewise linear function used for testing LACTOSE.</figcaption>
-</figure>
-
-Note: LACTOSE addresses computational inefficiencies in models with conditional branching.
-
-</span>
 
 

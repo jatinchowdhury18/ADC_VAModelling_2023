@@ -20,3 +20,7 @@ blackbox/ADC_Training_Data/
 slides/package.json
 slides/package-lock.json
 blackbox/ADC_Training_Data/
+slides/netlify.toml
+slides/components/*
+slides/.vite/*
+slides/slidev/*
