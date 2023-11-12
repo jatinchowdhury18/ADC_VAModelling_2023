@@ -27,7 +27,7 @@ Previously, at ADC 2020:
 <v-clicks depth="2">
 
 - In the 2010's [Kurt Werner](https://stacks.stanford.edu/file/druid:jy057cz8322/KurtJamesWernerDissertation-augmented.pdf) (and others) introduced the "R-Type Adaptor".
-- Instead of trying to decompose the circuit into a Series/Parallel tree, use a SPQR tree:
+- Instead of trying to decompose the circuit into a Series/Parallel tree, use a [SPQR tree](https://en.wikipedia.org/wiki/SPQR_tree):
   - S: Series
   - P: Parallel
   - Q: (don't worry about it)
@@ -197,7 +197,7 @@ Python + SageMath
 
 Mathematica
 
-<a href="https://www.wolframcloud.com/env/chowdsp/r_solver.nb">
+<a href="https://www.wolframcloud.com/obj/chowdsp/Published/r_solver.nb">
 <img src="/r_solver_math.png" style="height:75%"/>
 </a>
 
@@ -237,9 +237,9 @@ const auto Ra = ((Ag + 1) * Rc * Rd * Ri + Rb * Rc * Rd - (Rb * Rc + (Rb + Rc) *
 
 <v-clicks depth="3">
 
-- [RT-WDF](https://github.com/RT-WDF/rt-wdf_lib): C++, circuit model defined at run-time
-- [WDModels](https://faustlibraries.grame.fr/libs/wdmodels/): Faust, circuit model defined at compile-time
-- [chowdsp_wdf](https://github.com/Chowdhury-DSP/chowdsp_wdf): C++, circuit model defined at either run-time or compile-time
+- [RT-WDF](https://github.com/RT-WDF/rt-wdf_lib) (2016): C++, circuit model defined at run-time
+- [WDModels](https://faustlibraries.grame.fr/libs/wdmodels/) (2021): Faust, circuit model defined at compile-time
+- [chowdsp_wdf](https://github.com/Chowdhury-DSP/chowdsp_wdf) (2022): C++, circuit model defined at either run-time or compile-time
 
 </v-clicks>
 

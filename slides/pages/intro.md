@@ -41,13 +41,7 @@
 
 "Overdrive" circuit (Tube Screamer, Zen Drive, and many others)
 
-<img src="/ts_schematic_ndk_nodes.svg" style="margin-left:auto;margin-right:auto">
-
----
-
-# Just trying to add another slide 
-
-ASD ASD ASD
+<img src="/ts_schematic.svg" style="margin-left:auto;margin-right:auto">
  
 ---
 
