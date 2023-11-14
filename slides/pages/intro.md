@@ -1,3 +1,22 @@
+# Links
+
+<div class="grid grid-cols-2 gap-8">
+<div style="text-align:center">
+
+## Slides
+<img src="/slides_qr.svg" style="margin-left:auto;margin-right:auto;margin-top:10px;height:80%">
+
+</div>
+<div style="text-align:center">
+
+## Repo
+<img src="/repo_qr.svg" style="margin-left:auto;margin-right:auto;margin-top:10px;height:80%">
+
+</div>
+</div>
+
+---
+
 # Part 1 (ADC 2020)
 
 <a href="TODO">

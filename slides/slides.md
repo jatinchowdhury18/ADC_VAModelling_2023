@@ -18,14 +18,10 @@ drawings:
 # use UnoCSS
 css: unocss
 layout: image
-image: ./background.jpeg # @TODO: replcae the cover image
+image: ./title_card.png
 ---
 
-<br/>
-<h1 style="color:black">A Comparison of Virtual Analog Modelling Techniques</h1>
-
-<br/>
-<h5 style="color:black">Jatin Chowdhury and Christopher Clarke</h5>
+<!-- Title page -->
 
 ---
 
@@ -36,10 +32,12 @@ image: ./background.jpeg # @TODO: replcae the cover image
 
 - I am a freelance audio DSP developer based in Seattle, WA
 - Formerly at CCRMA and Tesla
-- I spend lots of time making plugins:
+- Primarily a plugin developer (as [Chowdhury DSP](https://chowdsp.com)):
   - [Chow Tape Model](https://github.com/jatinchowdhury18/AnalogTapeModel)
   - [BYOD](https://github.com/Chowdhury-DSP/BYOD)
   - [Chow Matrix](https://github.com/Chowdhury-DSP/ChowMatrix)
+
+<img src="https://raw.githubusercontent.com/jatinchowdhury18/RTNeural/main/doxygen/logo.png" style="margin-left:auto;margin-right:auto;margin-top:10px;width:65%">
 </div>
 <div>
 <img src="/headshot.jpg"/>
@@ -58,6 +56,7 @@ Dr. Christopher Johann Clarke
 - Research focusing on low-latency neural networks for audio DSP
 - Spent time as an audio engineer, musician, composer, etc
 
+<img src="https://raw.githubusercontent.com/jatinchowdhury18/RTNeural/main/doxygen/logo.png" style="margin-left:auto;margin-right:auto;margin-top:10px;width:65%">
 </div>
 <div style="overflow: hidden; height: 900px; width: auto; display: block; margin-left: auto; margin-right: auto;">
     <img src="/headshot_chris.jpg" style="width: 90%; margin-top: -50px;" />
@@ -102,9 +101,27 @@ hide: false
 # Thanks!
 <br/>
 
-[jatin@chowdsp.com](mailto:chowdsp@gmail.com)
+<div grid="~ cols-2 gap-4">
+<div style="text-align:center">
+
+[jatin@chowdsp.com](mailto:jatin@chowdsp.com)
 
 [https://github.com/jatinchowdhury18](https://github.com/jatinchowdhury18)
+
+</div>
+<div style="text-align:center">
+
+[chris.johann.clarke@gmail.com](mailto:chris.johann.clarke@gmail.com)
+
+[https://github.com/algoravioli](https://github.com/algoravioli)
+
+</div>
+</div>
+<br/>
+<div style="text-align:center">
+<img src="https://raw.githubusercontent.com/jatinchowdhury18/RTNeural/main/doxygen/logo.png" style="margin-left:auto;margin-right:auto;margin-top:10px;width:35%">
+<!-- Sponsored by RTNeural -->
+</div>
 
 ---
 layout: image

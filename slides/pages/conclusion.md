@@ -27,3 +27,48 @@ xychart-beta
 </v-clicks>
 </div>
 </div>
+
+---
+
+# Takeaways
+
+<v-clicks depth="2">
+
+- White-Box circuit modelling techniques
+  - Modified Nodal Analysis
+  - Nodal DK
+  - Wave Digital Filters
+  - And others! (Port-Hamiltonian, Nodal State Space, ...)
+- Black-Box circuit modelling techniques
+  - Neural Networks (convolutional networks, recurrent networks, transformers, conditional networks)
+  - And others! (Volterra Kernels, dynamic convolution, ...)
+- Grey-Box circuit modelling techniques
+  - Symbolic Representations
+  - Integrations with white-box modelling techniques
+  - Physics approximating networks
+
+</v-clicks>
+
+---
+
+# Takeaways
+
+<v-clicks depth="3">
+
+- **Which circuit modelling technique should I use for ________ circuit?**
+  - It depends! Consider...
+  - What kind of circuit is it?
+  - Do you want to be able to "tweak" and "modify" the model?
+  - Accuracy and performance goals
+
+</v-clicks>
+<br/>
+<v-clicks depth="3">
+
+
+- Some advice:
+  - Understanding your circuit better will _always_ result in a better model
+  - Think about what _you_ want out of making a circuit model
+  - Don't be afraid to make something new!
+
+</v-clicks>
