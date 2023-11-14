@@ -14,41 +14,42 @@
 <span class="text-sm">
 
 ## ToneX by IK Multimedia
-ToneX is a software by IK Multimedia designed for creating, playing, and sharing Tone Models of amps, cabinets, combos, and pedals. It utilizes AI Machine Modeling technology to model the sound of any amp, cabinet, combo or pedal with high sonic accuracy. The ToneX ecosystem is enriched by the IK Multimedia's Capture system, allowing users to turn their real amps, cabs, pedals, and full rigs into their own Tone Models in minutes.
+- Designed by IK Multimedia for creating, playing, and sharing Tone Models of amps, cabinets, combos, and pedal models.
+- Utilizes AI Machine Modeling technology to model the sound of any amp, cabinet, combo or pedal with high sonic accuracy.
+- A ToneX capture can be trained in just a few minutes.
+- Network type unknown.
 
 ## BABY Audio TAIP
-BABY Audio's TAIP is a tape emulation VST plugin that brings the true sound and behavior of analog tape into digital audio workstations. Described as a faithful AI-based emulation of a 1971 European tape machine, TAIP is ...
+- Tape emulation VST plugin that brings the true sound and behavior of analog tape to DAWs.
+- Network type unknown.
 
-## Other Similar Plugins
-- **Baby Audio Crystalline**: An algorithmic reverb plugin exploring the limits of reverb effect, offers features like BPM-synced reverberations and a depth section for modulating reverb respons.
-- **Baby Audio Comeback Kid**: An award-winning analog delay plugin, with unique delay effects to enhance audio tracks.
+## Neural Amp Modeler
+- Open Source guitar amp/pedal capture system and real-time plugin.
+- Uses a convolutional network.
 
 </span>
 
 ---
 
-<span class="text-sm">
+# Progress Update: Tackling Remaining Challenges
 
-## Progress Update: Tackling Remaining Challenges
-<br>
+<span class="text-med">
 
-#### Addressed in Part 1:
-- Computationally Expensive ✅
-- Hard to Implement ✅
+### Challenges in 2020: Neural networks ...
+- Are difficult to implement
+- Are computationally expensive
+- Have trouble with sample rate conversions (sometimes)
+- Have trouble with control parameters
 
-#### Addressing in Part 2:
-- **Sample Rate Conversions:** 
-    - Implemented efficient resampling algorithms to handle different sample rates seamlessly.
-    - Integrated real-time resampling to accommodate dynamic sample rate changes during processing.
+<br/>
 
-- **Control Parameters:** 
-    - Developed a robust parameter mapping system to translate user controls to processing parameters accurately.
-    - Introduced an intuitive user interface for real-time control, ensuring a responsive and user-friendly experience.
-
-### Benefits:
-- **Enhanced Flexibility:** Seamless handling of different sample rates and intuitive control over parameters.
-- **Improved Usability:** Reduced complexity in managing sample rate conversions and control parameters.
-- **Optimized Performance:** Lower computational load and latency thanks to efficient resampling and parameter management.
+### Solutions:
+- Real-Time Inferencing Engine: [RTNeural](https://github.com/jatinchowdhury18/RTNeural)
+  - (Relatively) easy to port models trained in TensorFlow or PyTorch.
+  - [Highly performant](https://github.com/jatinchowdhury18/RTNeural-compare), especially when model architecture is defined at compile-time.
+- [Recurrent networks can be adapted for multiple sample rates](https://medium.com/@jatinchowdhury18/sample-rate-agnostic-recurrent-neural-networks-238731446b2)
+  - Only works if inferencing sample rate is greater than or equal to training sample rate.
+- Networks can be trained to learn control parameters as conditioning inputs (see [Wright et al.](https://dafx.de/paper-archive/2019/DAFx2019_paper_43.pdf)).
 
 </span>
 

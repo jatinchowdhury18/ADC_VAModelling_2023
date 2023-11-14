@@ -67,8 +67,9 @@ xychart-beta
 
 
 - Some advice:
-  - Understanding your circuit better will _always_ result in a better model
-  - Think about what _you_ want out of making a circuit model
+  - Small black/grey-box models can be very fast, but trimming your model may take _significant_ time.
+  - Understanding your circuit better will _always_ result in a better model.
+  - Think about what _you_ want out of making a circuit model.
   - Don't be afraid to make something new!
 
 </v-clicks>
