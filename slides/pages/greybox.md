@@ -237,16 +237,53 @@ Wave-digital-domain Autoencoder-shaped networks For Fast Learning and Emulation
 
 </div>
 <div>
+<span class="text-sm">
+Consider a neural network with inputs:
 
-Van Maanen and van der Veen nonlinear capacitor model:
-$V^2_t = \frac{2x^2_t.(m\ddot{x}+k_1\dot{x}+k_2[x_t-x_0])}{\in_C.A}$
+$\text{R}_{\text{in}}$ : Voltages across potentiometer terminals that determine $\text{R}_{\text{in}}$. $\text{R}_{\text{in}-}$ : Resistance of the potentiometer minus $\text{R}_{\text{in}}$.
 
-Converted to operator structure:
+$C_7$,$C_8$ : The capacitance of the capacitor $C_7$,$C_8$.
 
-$\mathbb{F}* = \frac{2 \mathbf{x_1}^2.(\mathbf{x_2}\mathbf{x_3}+\mathbf{x_4}\mathbf{x_5}+\mathbf{x_6}[\mathbf{x_7}-\mathbf{x_8}])}{\mathbf{x_9}.\mathbf{x_10}}$
+$R_{13}$ : The resistance of the resistor $R_{13}$.
 
-where each $\mathbf{x_n}$ is a trainable variable based on input from previous layer.
+Concatenated to form a single input vector to the mesa-model $\mathbb{M}_{\texttt{circuit}}$.
 
+$\mathbb{M}_{\texttt{circuit}} = \texttt{MLP} \circ \bigcup(\text{R}_{\text{in}},\text{R}_{\text{in}-},C_7 \bigcup C_8, R_{13})$
+
+$x_{\texttt{latent}} = \bigcup(\mathbb{M}_{\texttt{circuit}},V_{\text{in}})$
+
+$V_{\text{in}}$ is the transformed wave domain equivalent of the input signal.
+
+</span>
+</div>
+</div>
+
+---
+
+# WAFFLE
+
+Total error $1.07e-7$ trained for 150 epochs
+
+<div grid="~ cols-2 gap-4">
+<div>
+
+<img src="/portgradient_colour.png" style="margin-left:auto;margin-right:auto;width:95%"/>
+
+</div>
+<div>
+<span class="text-sm">
+
+The output of $\mathbb{M}_{\text{PORTS}}$ is then concatenated with the output of the PANN model ($\hat{P}$) to form a single vector $\hat{y}_{ \texttt{latent}}$. $\hat{y}_{ \texttt{latent}}$ is then passed to a postprocessing MLP, $\mathbb{M}_{\text{post-processing}}$ to form the final output of the WAFFLE model.
+
+$\mathbb{M}_{\text{PORTS}} = \texttt{MLP}([1.0] \ \forall \text{Port} \  \in  \ \text{Ports})$
+
+where $i\text{Port} \in \text{Ports}\{A, B, C, D\}$.
+
+$\hat{y} = \mathbb{M}_{\text{post-processing}} (\hat{y}_{ \texttt{latent}})$
+
+$\hat{y} = \mathbb{M}_{\text{post-processing}} \circ \bigcup(\mathbb{M}_{\text{PORTS}},\hat{P})$
+
+</span>
 </div>
 </div>
 
