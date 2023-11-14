@@ -46,15 +46,15 @@ def add_timesteps(data, num_timesteps):
 # Step 1: Read and Process Audio Files
 # Define your filenames
 filenames = [
-    "blackbox/ADC_Training_Data/out_03.wav",
-    "blackbox/ADC_Training_Data/out_00.wav",
-    "blackbox/ADC_Training_Data/out_01.wav",
-    "blackbox/ADC_Training_Data/.DS_Store",
-    "blackbox/ADC_Training_Data/out_10.wav",
-    "blackbox/ADC_Training_Data/out_07.wav",
-    "blackbox/ADC_Training_Data/train_input_96k.wav",
-    "blackbox/ADC_Training_Data/out_001.wav",
-    "blackbox/ADC_Training_Data/out_0001.wav",
+    "../../training/data/out_03.wav",
+    "../../training/data/out_00.wav",
+    "../../training/data/out_01.wav",
+    "../../training/data/.DS_Store",
+    "../../training/data/out_10.wav",
+    "../../training/data/out_07.wav",
+    "../../training/data/train_input_96k.wav",
+    "../../training/data/out_001.wav",
+    "../../training/data/out_0001.wav",
 ]
 
 # Filter out .DS_Store and sort the list for consistency
@@ -63,12 +63,12 @@ wav_files = sorted(
         file
         for file in filenames
         if file.endswith(".wav")
-        and file != "blackbox/ADC_Training_Data/train_input_96k.wav"
+        and file != "../../training/data/train_input_96k.wav"
     ]
 )
 
 # Read the input signal
-input_rate, input_signal = read("blackbox/ADC_Training_Data/train_input_96k.wav")
+input_rate, input_signal = read("../../training/data/train_input_96k.wav")
 
 # Initialize an empty list to hold all data
 data = []
@@ -95,18 +95,25 @@ data_array = np.array(data)
 num_timesteps = 8  # Or any other integer you want to specify
 extended_data_array = add_timesteps(data_array, num_timesteps)
 
+print(extended_data_array.shape)
+print(extended_data_array[10000:10005, :])
+
 # export extended_data_array to csv
-np.savetxt(
-    "blackbox/ADC_Training_Data/extended_data_array.csv",
-    extended_data_array,
-    delimiter=",",
-)
+# np.savetxt(
+#     "blackbox/ADC_Training_Data/extended_data_array.csv",
+#     extended_data_array,
+#     delimiter=",",
+# )
 
 # Now, prepare the data for PySR
 X = np.concatenate(
     (extended_data_array[:, :2], extended_data_array[:, 3:]), axis=1
 )  # input features, with additional timesteps
 y = extended_data_array[:, 2]  # output feature, same as before
+
+print(X.shape)
+
+exit()
 
 # Step 3: Run PySR
 # Initialize PySR model with desired options

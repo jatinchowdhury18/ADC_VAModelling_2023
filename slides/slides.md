@@ -17,9 +17,8 @@ drawings:
   persist: false
 # use UnoCSS
 css: unocss
-
 layout: image
-image: /background.jpeg # @TODO: replcae the cover image
+image: ./background.jpeg # @TODO: replcae the cover image
 ---
 
 <br/>

@@ -8,6 +8,7 @@ namespace plt = matplotlibcpp;
 #include "wdf/ts_wdf.hpp"
 #include "rnn/ts_rnn.hpp"
 #include "mna/ts_mna.hpp"
+#include "sym/ts_sym.hpp"
 
 static constexpr auto sample_rate = 96000.0f;
 static constexpr auto test_freq = 100.0f;
@@ -109,9 +110,23 @@ int main (int argc, char* argv[])
             plt::named_plot<float> (plot_name, wdf_out);
         }
     }
+    else if (std::string { argv[1] } == "--sym")
+    {
+        TS_Sym ts_sym {};
+        for (auto distortion_val : { 0.0f, 0.1f, 1.0f })
+        {
+            ts_sym.prepare (sample_rate);
+            ts_sym.x[1] = distortion_val;
+            std::vector<float> wdf_out { data.begin(), data.end() };
+            ts_sym.process (data, wdf_out);
+
+            const auto plot_name = "P1 = " + std::to_string (static_cast<int> (TS_WDF<>::Pot1 * distortion_val) / 1000) + " KOhms";
+            plt::named_plot<float> (plot_name, wdf_out);
+        }
+    }
 
 //    plt::ylim (3.5, 5.5);
-    plt::ylim (3.75, 5.25);
+    // plt::ylim (3.75, 5.25);
     plt::xlim (1000, 4500);
     plt::legend();
     plt::grid (true);
