@@ -208,17 +208,7 @@ Mathematica
 
 # Overdrive Circuit R-Type Adaptor
 
-```cpp {all|1-4|6-9|11-17|19-20|all}
-// op-amp parameters
-static constexpr float Ag = ...; // open-loop gain
-static constexpr float Ri = ...; // input impedance
-static constexpr float Ro = ...; // output impedance
-
-// "downward"-facing port impedances
-float Rb = ...; // port B impedance
-float Rc = ...; // port C impedance
-float Rd = ...; // port D impedance
-
+```cpp {all}
 // scattering matrix
 const auto scattering_matrix[][] = {
     { 0, (Ag + Rd * Ri - Rc + Rd + Rc + Ro) / ((Rb + Rc) * Rd + ... },
@@ -265,18 +255,6 @@ Benchmark: time needed to process 1000 seconds of audio at 48 kHz sample rate:
 
 # Overdrive Circuit WDF Implementation
 
-chowdsp_wdf features:
-
-<v-clicks depth="2">
-
-- Support for R-Type adaptors with generated scattering matrices in terms of other port impedances.
-- Methods for updating component values without doing redundant work.
-- "Combined" WDF elements, for improved performance.
-
-</v-clicks>
-
-<v-clicks at="3">
-
 ```cpp
 #include <chowdsp_wdf/chowdsp_wdf>
 namespace wdft = chowdsp::wdft;
@@ -296,8 +274,6 @@ struct Overdrive_WDF
 };
 ```
 
-</v-clicks>
-
 ---
 
 # Overdrive Circuit WDF Implementation
@@ -305,8 +281,6 @@ struct Overdrive_WDF
 ```cpp {all} {maxHeight:'95%'}
 struct Overdrive_WDF
 {
-    // ...
-    
     struct ImpedanceCalc
     {
         template <typename RType>

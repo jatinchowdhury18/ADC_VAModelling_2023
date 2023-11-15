@@ -16,12 +16,12 @@ xychart-beta
 <v-clicks depth="2">
 
 - White-box models can be _very_ fast.
-- Black-box models can achieve good performance, but larger networks are slower.
+- Black-box models can achieve good performance, but larger models are slower.
 - Grey-box models often fall somewhere in-between.
 - YMMV depending on the circuit being modelled and the accuracy required.
 - Trade-offs (Accuracy vs. speed):
-  - Iterative solver constraints
-  - Function approximations
+  - Iterative solver constraints (white-box only)
+  - Maths function approximations
   - Neural network size
 
 </v-clicks>
@@ -46,6 +46,7 @@ xychart-beta
   - Symbolic Representations
   - Integrations with white-box modelling techniques
   - Physics approximating networks
+  - And others! (active research area)
 
 </v-clicks>
 
@@ -67,7 +68,7 @@ xychart-beta
 
 
 - Some advice:
-  - Small black/grey-box models can be very fast, but trimming your model may take _significant_ time.
+  - Small models can be very fast, but optimizing your model may take _significant_ effort.
   - Understanding your circuit better will _always_ result in a better model.
   - Think about what _you_ want out of making a circuit model.
   - Don't be afraid to make something new!

@@ -9,8 +9,8 @@ Previously, at ADC 2020:
 - Bilinear transform
 - Limitation: only works for linear circuits
 - Alternative Methods:
-  - Nodal DK
-  - Modified Nodal Analysis
+  - Nodal DK (NDK)
+  - Modified Nodal Analysis (MNA)
 
 </v-clicks>
   
@@ -222,6 +222,40 @@ struct Overdrive_MNA {
     }
 };
 ```
+
+---
+
+# Modified Nodal Analysis Complete Implementation
+
+```cpp
+float process_sample (float Vi) {
+    const auto Vplus = (gC2 * R5 * Vi - R5 * iC2eq + Vb) * gC2_R5_recip; // compute Vplus from Vi
+    const auto Vminus = Vplus; // Vminus = Vplus (op-amp rule)
+    const auto iC3 = (gC3 * Vminus - iC3eq) * gC3_R4_recip; // compute current through C3 (same as current through R4)
+
+    int nIters = 0; T delta;
+    do {
+        const auto [sinh_Vd, cosh_Vd] = sinh_cosh (Vd * Vt_recip);
+        const auto F = Vd * RP_recip + gC4 * Vd - iC4eq - iC3 + twoIs * sinh_Vd;
+        const auto F_deriv = RP_recip + gC4 + (twoIs * Vt_recip) * cosh_Vd;
+        delta = F / F_deriv;
+        Vd -= delta;
+    } while (std::abs (delta) > (T) 1.0e-3 && ++nIters < 10);
+
+    // update capacitor states
+    const auto vC2 = Vi - Vplus; iC2eq = (T) 2 * gC2 * vC2 - iC2eq;
+    const auto vC3 = (iC3 + iC3eq) * gC3_recip; iC3eq = (T) 2 * gC3 * vC3 - iC3eq;
+    iC4eq = (T) 2 * gC4 * Vd - iC4eq;
+
+    return Vminus + Vd; // read output voltage
+}
+```
+
+<v-clicks>
+
+Exercise for the reader: can we use SIMD to optimize `processSample()`?
+
+</v-clicks>
 
 ---
 

@@ -37,7 +37,15 @@ image: ./title_card.png
   - [BYOD](https://github.com/Chowdhury-DSP/BYOD)
   - [Chow Matrix](https://github.com/Chowdhury-DSP/ChowMatrix)
 
-<img src="https://raw.githubusercontent.com/jatinchowdhury18/RTNeural/main/doxygen/logo.png" style="margin-left:auto;margin-right:auto;margin-top:10px;width:65%">
+<br/>
+<div grid="~ cols-2 gap-4">
+<div>
+<img src="https://chowdsp.com/logo.png" style="margin-left:auto;margin-right:auto;margin-top:10px;width:70%">
+</div>
+<div>
+<img src="https://raw.githubusercontent.com/jatinchowdhury18/RTNeural/main/doxygen/logo.png" style="margin-left:auto;margin-right:auto;margin-top:10px;width:100%">
+</div>
+</div>
 </div>
 <div>
 <img src="/headshot.jpg"/>
