@@ -1,11 +1,20 @@
+
+<span class="flex justify-center items-center">
+
+# Blackbox Models
+
+</span>
+
+---
+
 # Neural Network Architectures
 
 <span class="text-sm">
 
 | WaveNet | Temporal Convolutional Networks (TCNs) | Recurrent Neural Networks (RNNs) | State Transition Networks |
 |---------|----------------------------------------|---------------------------------|---------------------------|
-| A deep neural network for generating raw audio waveforms, known for its high fidelity in text-to-speech and musical applications. | A type of convolutional neural network designed to handle sequence data by capturing temporal dependencies. | Neural networks with loops to allow information persistence, suitable for handling sequence data like time-series or text. | Networks modeling the transitions between states in a system, often used to learn and represent dynamic behaviors. |
-| - Utilizes causal dilated convolutions. <br> - Capable of modeling temporal dependencies in data. <br> - High-quality audio generation. | - Employs dilated convolutions for long-range dependencies. <br> - Efficient and parallelizable architecture. <br> - Often used in tasks like sequence modeling and time-series prediction. | - Processes sequences step-by-step, maintaining an internal state. <br> - Suited for tasks like language modeling, speech recognition. <br> - Variants include LSTM and GRU. | - Captures state transitions in a structured manner. <br> - Suitable for tasks with clear state dynamics, like robotics or control systems. <br> - Can be integrated with other architectures for complex modeling. |
+| A deep neural network for generating raw audio waveforms, known for its high fidelity in text-to-speech and musical applications. | A type of convolutional neural network designed to handle sequence data by capturing temporal dependencies. | Neural networks with loops to allow information persistence, suitable for handling sequence data like time-series or text. | Networks modeling the transitions between states in a system, often used to learn and represent dynamic behaviours. |
+| - Utilizes causal dilated convolutions. <br> - Capable of modeling temporal dependencies in data. <br> - High-quality audio generation. | - Employs dilated convolutions for long-range dependencies. <br> - Efficient and parallelizable architecture. <br> - Often used in tasks like sequence modeling and time-series prediction. | - Processes sequences step-by-step, maintaining an internal state. <br> - Suited for tasks like language modeling, speech recognition. <br> - Variants include LSTM and GRU. | - Captures state transitions in a structured manner. <br> - Suitable for tasks with clear state dynamics. <br> - Can be integrated with other architectures for complex modeling. |
 
 </span>
 
