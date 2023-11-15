@@ -130,8 +130,3 @@ hide: false
 <img src="https://raw.githubusercontent.com/jatinchowdhury18/RTNeural/main/doxygen/logo.png" style="margin-left:auto;margin-right:auto;margin-top:10px;width:35%">
 <!-- Sponsored by RTNeural -->
 </div>
-
----
-layout: image
-image: /end_screen.jpeg # @TODO: replcae the cover image
----
